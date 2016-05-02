@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.app.mhwan.easymessage.Activity.MessageActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorTabbar"
+        android:minHeight="?android:attr/actionBarSize"
+        app:popupTheme="@style/AppTheme.Toolbar.Popuptheme"
+        app:subtitleTextAppearance="@style/AppTheme.Toolbar.SubTitle"
+        app:theme="@style/AppTheme.Toolbar"
+        app:titleTextAppearance="@style/AppTheme.Toolbar.Title" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/message_input_window"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:maxHeight="94dp"
+            android:minHeight="42dp">
+
+            <View
+                android:id="@+id/horiz"
+                android:layout_width="match_parent"
+                android:layout_height="1.1dp"
+                android:layout_alignParentTop="true"
+                android:background="@color/colorPrimary" />
+
+
+            <TextView
+                android:id="@+id/message_send_button"
+                android:layout_width="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="6dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:background="@drawable/bg_send_button"
+                android:text="@string/send"
+                android:textColor="@color/colorLightprimary"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/message_send_button"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="2dp"
+                android:layout_above="@id/message_send_button"
+                android:layout_marginBottom="4dp"
+                android:text="12/80byte"
+                android:textSize="11sp"/>
+
+            <EditText
+                android:id="@+id/message_input"
+                android:layout_width="match_parent"
+                android:layout_alignParentLeft="true"
+                android:padding="8dp"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/colorDarkPrimary"
+                android:textColorHint="#a3a3a3"
+                android:textSize="14dp"
+                android:theme="@style/EditTextTheme"
+                android:hint="@string/empty_content"
+                android:layout_toLeftOf="@id/message_send_button"
+                android:background="@android:color/transparent"
+                android:layout_below="@id/horiz"
+                android:layout_alignParentTop="true"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/message_input_window"></android.support.v7.widget.RecyclerView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/shadow" />
+    </RelativeLayout>
+
+</LinearLayout>

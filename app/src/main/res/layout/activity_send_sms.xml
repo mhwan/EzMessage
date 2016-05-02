@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.app.mhwan.easymessage.Activity.SendSMSActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorTabbar"
+        android:minHeight="?android:attr/actionBarSize"
+        app:theme="@style/AppTheme.Toolbar">
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/send_message"
+            android:textColor="@color/colorPrimary"
+            android:textSize="21sp" />
+
+        <TextView
+            android:id="@+id/toolbar_send"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right|center_vertical"
+            android:background="@drawable/selector_item_touch_effect"
+            android:padding="12dp"
+            android:text="@string/send"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+    </android.support.v7.widget.Toolbar>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fadeScrollbars="true"
+            android:fillViewport="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingLeft="14dp"
+                android:paddingRight="8dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="6dp">
+
+                    <TextView
+                        android:id="@+id/number_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/cell_phone_number"
+                        android:textColor="@color/colorLightprimary"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/ic_add_contact"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:src="@mipmap/ic_add_contact"
+                        android:background="@drawable/selector_item_touch_effect"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="8dp"
+                        android:paddingRight="6dp"
+                        android:paddingLeft="6dp"/>
+
+                    <com.app.mhwan.easymessage.CustomView.ContactsChipsView
+                        android:id="@+id/contacts_chipsview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@id/number_title"
+                        android:layout_toLeftOf="@id/ic_add_contact"
+                        android:background="@android:color/transparent"
+                        android:focusableInTouchMode="true"
+                        android:hint="@string/empty_number"
+                        android:imeOptions="actionDone"
+                        android:theme="@style/EditTextTheme"
+                        android:inputType="text|textNoSuggestions|textMultiLine"
+                        android:textColor="@color/colorDarkPrimary"
+                        android:textColorHint="#a3a3a3"
+                        android:textSize="14sp" />
+
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/contacts_chipsview"
+                        android:layout_marginTop="16dp"
+                        android:background="#d1c4e9" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/schedule_window"
+                    android:background="@drawable/selector_item_touch_effect"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp">
+
+                    <TextView
+                        android:id="@+id/schedule_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="4dp"
+                        android:text="@string/Schedule_time"
+                        android:textColor="@color/colorLightprimary"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/schedule_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@id/schedule_title"
+                        android:text="PM 12:24 / 2016.02.08"
+                        android:textColor="@color/colorDarkPrimary"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/schedule_title"
+                        android:background="#d1c4e9" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/multy_window"
+                    android:background="@drawable/selector_item_touch_effect"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp">
+
+                    <TextView
+                        android:id="@+id/multy_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="4dp"
+                        android:text="@string/repetition_number"
+                        android:textColor="@color/colorLightprimary"
+                        android:textSize="15sp" />
+
+                    <EditText
+                        android:id="@+id/multy_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/multy_title"
+                        android:background="@android:color/transparent"
+                        android:inputType="number"
+                        android:theme="@style/EditTextTheme"
+                        android:paddingLeft="10dp"
+                        android:text="1"
+                        android:textColor="@color/colorDarkPrimary"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/multy_title"
+                        android:background="#d1c4e9" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginTop="7dp">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginBottom="5dp"
+                        android:text="@string/message_content"
+                        android:textColor="@color/colorLightprimary"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/textbyte"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/title"
+                        android:layout_alignParentRight="true"
+                        android:text="00/80 byte"
+                        android:textColor="@color/colorDarkPrimary"
+                        android:textSize="13sp" />
+
+                    <EditText
+                        android:id="@+id/sms_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/EditTextTheme"
+                        android:layout_below="@id/title"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/empty_content"
+                        android:textColor="@color/colorDarkPrimary"
+                        android:textColorHint="#a3a3a3"
+                        android:textSize="13sp" />
+                </RelativeLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <View
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@drawable/shadow" />
+    </RelativeLayout>
+</LinearLayout>

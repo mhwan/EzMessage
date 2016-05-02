@@ -1,0 +1,58 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="MyTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="toolbarStyle">@style/AppTheme.Toolbar</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+    <style name="AppTheme.Toolbar.Popuptheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:colorBackground">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="AppTheme.Toolbar" parent="Theme.AppCompat">
+        <!-- Customize color of navigation drawer icon and back arrow -->
+        <item name="background">@color/colorTabbar</item>
+        <item name="android:textColorPrimary">@color/colorPrimary</item>
+        <item name="android:textSize">21sp</item>
+    </style>
+
+    <style name="AppTheme.Toolbar.Title" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">19sp</item>
+    </style>
+
+
+    <style name="AppTheme.Toolbar.SubTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
+        <item name="android:textColor">@color/colorDarkPrimary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">@color/colorPrimary</item>
+        <item name="tabIndicatorHeight">3dp</item>
+        <item name="tabBackground">@color/colorTabbar</item>
+        <item name="tabSelectedTextColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="EditTextTheme">]
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <!-- colorControlActivated 포커스 되었을때 -->
+    </style>
+    <!--
+    <style name="MySearchview" parent="Base.Widget.AppCompat.SearchView">
+        <item name="android:colorControlNormal">@color/colorPrimary</item>
+        <item name="android:colorControlActivated">@color/colorDarkPrimary</item>
+    </style>-->
+</resources>

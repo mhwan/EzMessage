@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <FrameLayout
+        android:id="@+id/chipscircle"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginLeft="8dp"
+        android:layout_centerVertical="true">
+
+        <com.app.mhwan.easymessage.CustomView.RandomProfileIcon
+            xmlns:mhwan="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/chips_ic_person"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            mhwan:icon_src="@mipmap/ic_person"
+            mhwan:icon_padding="11dp">
+        </com.app.mhwan.easymessage.CustomView.RandomProfileIcon>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/chips_image_person"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_toRightOf="@id/chipscircle"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="배명환"
+            android:id="@+id/chips_list_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#4a4a4a"
+            android:textSize="14sp" />
+
+        <TextView
+            android:text="010-5057-4876"
+            android:id="@+id/chips_list_phNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/chips_list_name"
+            android:layout_below="@id/chips_list_name"
+            android:layout_marginTop="3dp"
+            android:textColor="@color/colorDarkPrimary"
+            android:textSize="13dp" />
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:paddingBottom="7dp"
+    android:paddingLeft="8dp"
+    android:paddingTop="7dp">
+    <FrameLayout
+
+        android:id="@+id/circle"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_centerVertical="true">
+
+        <com.app.mhwan.easymessage.CustomView.RandomProfileIcon
+            xmlns:mhwan="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/select_ic_person"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            mhwan:icon_src="@mipmap/ic_person"
+            mhwan:icon_padding="11dp">
+        </com.app.mhwan.easymessage.CustomView.RandomProfileIcon>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/select_image_person"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_toRightOf="@id/circle"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="9dp"
+        android:layout_marginRight="8dp"
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content">
+
+        <CheckBox
+            android:id="@+id/select_checkbox"
+            android:focusable="false"
+            android:clickable="false"
+            android:focusableInTouchMode="false"
+            android:layout_alignParentRight="true"
+            android:buttonTint="@color/colorPrimary"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/select_name"
+            android:layout_alignParentLeft="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorDarkPrimary"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/select_phNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/select_name"
+            android:layout_below="@id/select_name"
+            android:layout_marginTop="3dp"
+            android:textColor="@color/colorLightprimary"
+            android:textSize="13dp" />
+    </RelativeLayout>
+
+</RelativeLayout>

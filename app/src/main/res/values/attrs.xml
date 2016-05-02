@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RandomProfileIcon">
+        <attr name="icon_src" format="reference"/>
+        <attr name="bg_color" format="color"/>
+        <attr name="icon_padding" format="dimension" />
+        <attr name="bg_shape" />
+        <attr name="border_width" format="dimension" />
+        <attr name="border_color" format="color" />
+    </declare-styleable>
+    <attr name="bg_shape" format="enum">
+        <enum name="circle" value="0"/>
+        <enum name="rectangle" value="1"/>
+        <enum name="pentagon" value="2"/>
+        <enum name="hexagon" value="3" />
+    </attr>
+</resources>

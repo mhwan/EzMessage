@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.SearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
+        android:theme="@style/EditTextTheme"
+        app:queryHint="@string/search_name_or_number"></android.support.v7.widget.SearchView>
+
+    <View
+        android:layout_below="@id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="0.7dp"
+        android:background="#c7c7c7" />
+</RelativeLayout>

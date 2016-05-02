@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="title_array">
+        <item>@string/contacts_name</item>
+        <item>@string/message_name</item>
+    </string-array>
+    <string-array name="message_type_array">
+        <item>@string/general_message</item>
+        <item>@string/scheduled_message</item>
+        <item>@string/multi_message</item>
+    </string-array>
+    <string-array name="option_array">
+        <item>@string/message_option_delete</item>
+        <item>@string/message_option_forward</item>
+        <item>@string/message_option_copy</item>
+        <item>@string/message_option_share</item>
+    </string-array>
+    <string-array name="snackbar_message_array">
+        <item>@string/sms_send_permission_request</item>
+        <item>@string/call_permission_request</item>
+        <item>@string/contact_permission_request</item>
+    </string-array>
+    <array name="user_color">
+        <item>@color/light_red</item>
+        <item>@color/light_ared</item>
+        <item>@color/light_pink</item>
+        <item>@color/light_apink</item>
+        <item>@color/light_purple</item>
+        <item>@color/light_apurple</item>
+        <item>@color/light_dpurple</item>
+        <item>@color/light_dapurple</item>
+        <item>@color/light_indigo</item>
+        <item>@color/light_aindigo</item>
+        <item>@color/light_blue</item>
+        <item>@color/light_ablue</item>
+        <item>@color/light_cyan</item>
+        <item>@color/light_acyan</item>
+        <item>@color/light_teal</item>
+        <item>@color/light_green</item>
+        <item>@color/light_agreen</item>
+        <item>@color/light_lgreen</item>
+        <item>@color/light_lime</item>
+        <item>@color/light_alime</item>
+        <item>@color/light_yellow</item>
+        <item>@color/light_ayellow</item>
+        <item>@color/light_dyellow</item>
+        <item>@color/light_orange</item>
+        <item>@color/light_dorange</item>
+        <item>@color/light_daorange</item>
+        <item>@color/light_grey</item>
+        <item>@color/light_bgrey</item>
+        <item>@color/light_brown</item>
+    </array>
+</resources>
