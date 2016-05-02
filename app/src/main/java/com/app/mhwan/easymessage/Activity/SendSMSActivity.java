@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.app.mhwan.easymessage.CustomBase.AppContext;
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.CustomBase.DLog;
-import com.app.mhwan.easymessage.CustomBase.MessageDBHelper;
+import com.app.mhwan.easymessage.CustomBase.ScheduleMessageDBHelper;
 import com.app.mhwan.easymessage.CustomBase.MessageManager;
 import com.app.mhwan.easymessage.CustomBase.RequestPermission;
 import com.app.mhwan.easymessage.CustomBase.ScheduleMessageItem;
@@ -66,7 +66,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
     private Toast overByteToast = null;
     private Calendar scheduled_date;
     private boolean issetSchedule_time = false;
-    private MessageDBHelper dbHelper;
+    private ScheduleMessageDBHelper dbHelper;
     private String forwardcontent = null;
 
     @Override
@@ -82,7 +82,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
         }
         else
             DLog.e("bundle : null");
-        dbHelper = new MessageDBHelper(this);
+        dbHelper = new ScheduleMessageDBHelper(this);
 
         initToolbar();
         initChipsView(temp_Id);

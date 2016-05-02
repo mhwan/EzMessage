@@ -20,11 +20,11 @@ import java.util.ArrayList;
  * Created by Mhwan on 2016. 4. 2..
  */
 public class SMSReceiver extends BroadcastReceiver {
-    private MessageDBHelper dbHelper;
+    private ScheduleMessageDBHelper dbHelper;
     @Override
     public void onReceive(Context context, Intent intent) {
         String string = intent.getAction();
-        dbHelper = new MessageDBHelper(context);
+        dbHelper = new ScheduleMessageDBHelper(context);
         //예약문자인 경우
         if (string.equals(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION)) {
             ArrayList<String> phNum = intent.getStringArrayListExtra(AppUtility.BasicInfo.SEND_SCHEDULE_PHNUM);
