@@ -18,6 +18,7 @@ import android.widget.ListView;
 
 import com.app.mhwan.easymessage.Activity.MainActivity;
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
+import com.app.mhwan.easymessage.CustomBase.DLog;
 import com.app.mhwan.easymessage.CustomView.ContactAdapter;
 import com.app.mhwan.easymessage.R;
 import com.daimajia.swipe.SwipeLayout;
@@ -79,9 +80,18 @@ public class ContactsFragment extends Fragment implements MainActivity.BackKeyPr
             }
         });
         listView.setTextFilterEnabled(true);
-        SearchView searchView = (SearchView) mView.findViewById(R.id.search_view);
+        final SearchView searchView = (SearchView) mView.findViewById(R.id.search_view);
         setSearchViewColor(searchView);
         searchView.setIconifiedByDefault(false);
+        //closelistener 작동x 버튼 아이디에 접근하여 클릭리스너를 달음
+        searchView.findViewById(R.id.search_close_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DLog.d("close!!");
+                adapter.closeAllItems();
+                searchView.setQuery("", false);
+            }
+        });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -92,13 +102,26 @@ public class ContactsFragment extends Fragment implements MainActivity.BackKeyPr
             public boolean onQueryTextChange(String newText) {
                 if (TextUtils.isEmpty(newText))
                     listView.clearTextFilter();
-                else
+                else {
+                    adapter.closeAllItems();
                     listView.setFilterText(newText);
+                }
                 return true;
             }
         });
+
+        AppUtility.getAppinstance().getRunningActivity();
     }
 
+
+    /**
+     * searchview id
+     *
+     * serchicon : android.support.v7.appcompat.R.id.search_mag_icon
+     * closeicon : R.id.search_close_btn
+     * autocomplete : R.id.search_src_text
+     * @param searchView
+     */
     private void setSearchViewColor(SearchView searchView) {
         LinearLayout ll = (LinearLayout) searchView.getChildAt(0);
         LinearLayout ll2 = (LinearLayout) ll.getChildAt(2);

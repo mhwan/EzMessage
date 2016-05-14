@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import com.app.mhwan.easymessage.Activity.MessageActivity;
 import com.app.mhwan.easymessage.CustomBase.AppContext;
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.CustomBase.DLog;
+import com.app.mhwan.easymessage.CustomBase.MessageDBHelper;
 import com.app.mhwan.easymessage.R;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
@@ -36,10 +38,12 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
     private Context context;
     private ArrayList<MessageListItem> mListItems;
     private int[] light_color_array;
+    private MessageDBHelper messageDBHelper;
 
-    public MessageListAdapter(Context context, ArrayList<MessageListItem> items){
+    public MessageListAdapter(Context context, ArrayList<MessageListItem> items, MessageDBHelper messageDBHelper){
         this.context = context;
         this.mListItems = items;
+        this.messageDBHelper = messageDBHelper;
         light_color_array = context.getResources().getIntArray(R.array.user_color);
     }
     @Override
@@ -91,6 +95,7 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
                     @Override
                     public void finishedRemove(boolean issuccess) {
                         if (issuccess){
+                            messageDBHelper.removeAllMessage(mListItems.get(position).getPh_number());
                             mItemManger.removeShownLayouts(viewHolder.swipeLayout);
                             mListItems.remove(position);
                             notifyItemRemoved(position);
@@ -106,24 +111,33 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
             }
         });
         MessageListItem item = mListItems.get(position);
-        viewHolder.mName.setText(item.getName());
+        String name = item.getName();
+        viewHolder.mName.setText((name != null)? name : AppUtility.getAppinstance().changeNumberFormat(item.getPh_number()));
         viewHolder.mContent.setText(item.getLast_mContent());
-        viewHolder.mDate.setText(item.getLast_mTime());
+        if (AppUtility.getAppinstance().isToday(item.getLast_mTime(), AppUtility.BasicInfo.DB_DATETIME_FORMAT))
+            viewHolder.mDate.setText(AppUtility.getAppinstance().changeDateTimeFormat(item.getLast_mTime(), AppUtility.BasicInfo.DB_DATETIME_FORMAT, AppUtility.BasicInfo.GENERAL_TIME_FORMAT));
+        else
+            viewHolder.mDate.setText(AppUtility.getAppinstance().changeDateTimeFormat(item.getLast_mTime(), AppUtility.BasicInfo.DB_DATETIME_FORMAT, AppUtility.BasicInfo.GENERAL_DATETIME_FORMAT));
+
         if (item.getCount_no_read()>0){
+            viewHolder.image_schedule.setVisibility(View.GONE);
             viewHolder.mCount.setVisibility(View.VISIBLE);
             viewHolder.mCount.setText((item.getCount_no_read()>99)? "99+" : String.valueOf(item.getCount_no_read()));
         }
-        else
-            viewHolder.mCount.setVisibility(View.INVISIBLE);
-        if (item.getColor_value() < 0){
+        else {
+            viewHolder.mCount.setVisibility(View.GONE);
+            viewHolder.image_schedule.setVisibility((item.getRequest_code() < 0)? View.GONE : View.VISIBLE);
+        }
+        if (AppUtility.getAppinstance().getColorId(item.getPh_number()) < 0){
             viewHolder.circle.setVisibility(View.INVISIBLE);
             viewHolder.user_imageview.setVisibility(View.VISIBLE);
-            viewHolder.user_imageview.setImageBitmap(AppUtility.getAppinstance().loadContactPhoto(AppContext.getContext().getContentResolver(), item.getPerson_id(), item.getPhoto_id()));
+            long[] ids = AppUtility.getAppinstance().getPhotoPersonId(item.getPh_number());
+            viewHolder.user_imageview.setImageBitmap(AppUtility.getAppinstance().loadContactPhoto(AppContext.getContext().getContentResolver(), ids[0], ids[1]));
         }
         else {
             viewHolder.circle.setVisibility(View.VISIBLE);
             viewHolder.user_imageview.setVisibility(View.INVISIBLE);
-            viewHolder.circle.setCircleBackgroundColor(light_color_array[item.getColor_value()]);
+            viewHolder.circle.setCircleBackgroundColor(light_color_array[AppUtility.getAppinstance().getColorId(item.getPh_number())]);
         }
         //리사이클러뷰에 리스너를 달경우 스와이프상태일때 포커스를 가져가버림
         viewHolder.parent.setOnClickListener(new View.OnClickListener() {
@@ -131,7 +145,7 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
             public void onClick(View v) {
                 Intent intent = new Intent(context, MessageActivity.class);
                 intent.putExtra(AppUtility.BasicInfo.U_NAME, mListItems.get(position).getName());
-                intent.putExtra(AppUtility.BasicInfo.U_NUMBER, mListItems.get(position).getPh_num());
+                intent.putExtra(AppUtility.BasicInfo.U_NUMBER, mListItems.get(position).getPh_number());
                 ((Activity) context).startActivityForResult(intent, AppUtility.BasicInfo.MESSAGE_REQUEST);
             }
         });
@@ -155,6 +169,12 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
         return R.id.swipe;
     }
 
+    public void updateList(ArrayList<MessageListItem> list){
+        mListItems.clear();
+        mListItems.addAll(list);
+        notifyDataSetChanged();
+    }
+
     public static class ListViewHolder extends RecyclerView.ViewHolder{
         SwipeLayout swipeLayout;
         TextView mDate, mName, mContent, mCount;
@@ -162,6 +182,7 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
         RandomProfileIcon circle;
         CircleImageView user_imageview;
         RelativeLayout parent;
+        ImageView image_schedule;
 
         public ListViewHolder(View itemView) {
             super(itemView);
@@ -174,6 +195,7 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
             circle = (RandomProfileIcon) itemView.findViewById(R.id.ic_person);
             user_imageview = (CircleImageView) itemView.findViewById(R.id.image_person);
             parent = (RelativeLayout) itemView.findViewById(R.id.parent);
+            image_schedule = (ImageView) itemView.findViewById(R.id.image_schedule);
         }
     }
 

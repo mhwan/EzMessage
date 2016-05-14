@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.app.mhwan.easymessage.CustomBase.AppContext;
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.R;
+import com.mogua.localization.KoreanTextMatcher;
 
 import java.util.ArrayList;
 
@@ -108,6 +109,8 @@ public class SelectContactsAdapter extends BaseAdapter implements Filterable {
                             else if (c.getPhNumberChanged().contains(constraint.toString()))
                                 results.add(c);
                             else if (c.getUser_phNumber().contains(constraint.toString()))
+                                results.add(c);
+                            else if (KoreanTextMatcher.isMatch(c.getUser_Name(), constraint.toString()))
                                 results.add(c);
                         }
                     }

@@ -1,7 +1,9 @@
 package com.app.mhwan.easymessage.Fragment;
 
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -15,6 +17,9 @@ import android.widget.ListView;
 import com.app.mhwan.easymessage.Activity.MainActivity;
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.CustomBase.DLog;
+import com.app.mhwan.easymessage.CustomBase.MessageDBHelper;
+import com.app.mhwan.easymessage.CustomBase.NewMessageListener;
+import com.app.mhwan.easymessage.CustomBase.SMSReceiver;
 import com.app.mhwan.easymessage.CustomView.BottomSheet;
 import com.app.mhwan.easymessage.CustomView.BottomSheetAdapter;
 import com.app.mhwan.easymessage.CustomView.DividerItemDecoration;
@@ -30,18 +35,24 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SMSFragment extends Fragment implements MainActivity.BackKeyPressedListner, MainActivity.ActivityResultListner{
+public class SMSFragment extends Fragment implements MainActivity.BackKeyPressedListner, MainActivity.ActivityResultListner, NewMessageListener {
     private static final String ARG_PARAM1 = "param1";
     private int position;
     private ListView menulist;
     private BottomSheetLayout bottomSheetLayout;
     private View view;
     private MainActivity activity;
+    private MessageListAdapter mAdapter;
     private FloatingActionButton floatingActionButton;
     private ArrayList<MessageListItem> mListItems;
-    public SMSFragment(){
+    private MessageDBHelper messageDBHelper;
+    private SMSReceiver receiver;
+    private RecyclerView recyclerView;
+
+    public SMSFragment() {
 
     }
+
     public static SMSFragment newInstance(int position) {
         SMSFragment fragment = new SMSFragment();
         Bundle args = new Bundle();
@@ -62,14 +73,22 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_sms, container, false);
-        activity = (MainActivity)getActivity();
+        activity = (MainActivity) getActivity();
+        messageDBHelper = new MessageDBHelper(activity);
         activity.setOnBackKeyPressedListner(this);
         activity.setOnActivityResultListner(this);
+        receiver = new SMSReceiver(this);
+        IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+        intentFilter.addAction(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
+        activity.registerReceiver(receiver, intentFilter);
+
         initView();
 
         return view;
     }
-    private void initView(){
+
+    private void initView() {
+        DLog.d("init1!@@!");
         //init bottomsheets, fab
         bottomSheetLayout = (BottomSheetLayout) view.findViewById(R.id.bottom_sheet);
         menulist = (ListView) view.findViewById(R.id.list_menu);
@@ -87,11 +106,11 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
         floatingActionButton.setOnClickListener(fablistner());
 
         //init recycler view
-        final RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.recycler_view);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.addItemDecoration(new DividerItemDecoration(activity, DividerItemDecoration.VERTICAL_LIST, R.drawable.line_divider));
-        addmessageitem();
-        final MessageListAdapter mAdapter = new MessageListAdapter(activity, mListItems);
+        mListItems = messageDBHelper.getAllLastMessageList();
+        mAdapter = new MessageListAdapter(activity, mListItems, messageDBHelper);
         ((MessageListAdapter) mAdapter).setMode(Attributes.Mode.Single);
         recyclerView.setAdapter(mAdapter);
         /*
@@ -114,34 +133,22 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
         }));*/
     }
 
-    private void swipeOpen(View view){
+    private void swipeOpen(View view) {
         if (view instanceof SwipeLayout)
             ((SwipeLayout) view).open(true);
-        else if (view instanceof ViewGroup){
-            for (int i=0; i < ((ViewGroup) view).getChildCount(); i++){
+        else if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
                 View innerview = ((ViewGroup) view).getChildAt(i);
                 swipeOpen(innerview);
             }
         }
     }
 
-    private void addmessageitem(){
-        mListItems = new ArrayList<MessageListItem>();
-        for (int i =0; i<3; i++){
-            MessageListItem item = new MessageListItem();
-            item.setName("배명환");
-            item.setColor_value(5);
-            item.setPh_num("010-5057-4876");
-            item.setCount_no_read((i==1)? 0 : 100);
-            item.setLast_mTime("2014.06.12 12:20");
-            item.setLast_mContent("내용을 적으려하니 기분이 참 좋지않습니까라라ㅏ랄라라라라라 환상의 나라로 오세요 즐거운 축제가 열리는 곳 환장의나라 에버랜드");
-            mListItems.add(item);
-        }
-    }
-    public void slidetofab(){
+    public void slidetofab() {
         bottomSheetLayout.slideInFab();
     }
-    private View.OnClickListener fablistner(){
+
+    private View.OnClickListener fablistner() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -156,21 +163,58 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
         if (bottomSheetLayout.isFabExpanded()) {
             DLog.d("FabExpanded : true");
             bottomSheetLayout.slideInFab();
-        }
-        else
+        } else
             activity.getDoubleBackKeyPressed().onBackPressed();
     }
 
 
     @Override
     public void onActivityResults(int requestcode, int resultcode, Intent data) {
-        if (requestcode == AppUtility.BasicInfo.MESSAGE_REQUEST){
-            if (resultcode == AppUtility.BasicInfo.RESULT_NEW_MESSAGE){
+        if (requestcode == AppUtility.BasicInfo.MESSAGE_REQUEST || requestcode == AppUtility.BasicInfo.SEND_REQUEST) {
+            if (resultcode == AppUtility.BasicInfo.RESULT_NEW_MESSAGE || resultcode == Activity.RESULT_OK || resultcode == AppUtility.BasicInfo.SEND_RESERVED_SUCCESS) {
                 DLog.d("new_messsage!@#!@");
-            }
-            else if (resultcode == AppUtility.BasicInfo.RESULT_NOT_NEW){
+                update();
+            } else if (resultcode == AppUtility.BasicInfo.RESULT_NOT_NEW) {
                 DLog.d("not new_messsage!@#!@");
+                update();
             }
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (receiver == null){
+            receiver = new SMSReceiver(this);
+            IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+            intentFilter.addAction(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
+            activity.registerReceiver(receiver, intentFilter);
+        }
+        DLog.d("on resume");
+        DLog.d("smsfragment set listner");
+        receiver.setListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        try {
+            activity.unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 리스트를 db로부터 겟하여 어댑터를 업데이트 해준다.
+     */
+    private void update() {
+        DLog.d("fragment update!!");
+        mAdapter.updateList(messageDBHelper.getAllLastMessageList());
+    }
+
+    @Override
+    public void receiveNewMessage() {
+        update();
     }
 }

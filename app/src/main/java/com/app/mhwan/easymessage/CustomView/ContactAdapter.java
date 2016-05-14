@@ -22,6 +22,7 @@ import com.app.mhwan.easymessage.CustomBase.RequestPermission;
 import com.app.mhwan.easymessage.R;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
+import com.mogua.localization.KoreanTextMatcher;
 
 import java.util.ArrayList;
 
@@ -153,6 +154,8 @@ public class ContactAdapter extends BaseSwipeAdapter implements Filterable {
                                 results.add(c);
                             else if (c.getUser_phNumber().contains(constraint.toString()))
                                 results.add(c);
+                            else if (KoreanTextMatcher.isMatch(c.getUser_Name(), constraint.toString()))
+                                results.add(c);
                         }
                     }
                     return_filter.values = results;
@@ -174,7 +177,7 @@ public class ContactAdapter extends BaseSwipeAdapter implements Filterable {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 v.getBackground().setColorFilter(context.getResources().getColor(R.color.background_default_touch_color), PorterDuff.Mode.SRC_OVER);
                 v.invalidate();
-            } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() ==MotionEvent.ACTION_CANCEL) {
+            } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
                 v.getBackground().clearColorFilter();
                 v.invalidate();
             }

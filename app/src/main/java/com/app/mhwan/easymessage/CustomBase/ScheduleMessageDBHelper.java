@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Created by Mhwan on 2016. 4. 26..
  */
 public class ScheduleMessageDBHelper extends SQLiteOpenHelper {
-    public static String DB_NAME = "EZ_MESSAGE_DB";
+    public static String DB_NAME = "EZ_SCHDULE_MESSAGE_DB";
     public static String SCHEDULE_TABLE_NAME = "Schedule_message_TABLE";
     public static String SCHEDULE_KEY_ID = "_id";
     public static String SCHEDULE_KEY_CONTENT = "mContent";

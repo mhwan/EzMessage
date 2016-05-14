@@ -40,8 +40,8 @@
                 android:layout_weight="3"
                 android:background="@android:color/white"
                 android:text="@string/yes_Delete"
-                android:textSize="13sp"
-                android:textColor="@color/light_ared" />
+                android:textColor="@color/light_ared"
+                android:textSize="13sp" />
         </LinearLayout>
 
         <RelativeLayout
@@ -91,20 +91,33 @@
                     android:textColor="#adadad"
                     android:textSize="11sp" />
 
-                <TextView
-                    android:id="@+id/message_list_new"
+                <FrameLayout
+                    android:id="@+id/frame_new"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_below="@id/message_list_date"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/background_new_message"
-                    android:gravity="center"
-                    android:text="2"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:id="@+id/message_list_new"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/background_new_message"
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:text="2"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp" />
+                    <ImageView
+                        android:layout_gravity="center"
+                        android:id="@+id/image_schedule"
+                        android:src="@mipmap/image_schedule_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/message_list_name"
@@ -122,9 +135,9 @@
                     android:layout_alignLeft="@id/message_list_name"
                     android:layout_below="@id/message_list_name"
                     android:layout_marginTop="3dp"
-                    android:layout_toLeftOf="@id/message_list_new"
-                    android:maxLines="2"
+                    android:layout_toLeftOf="@id/frame_new"
                     android:ellipsize="end"
+                    android:maxLines="2"
                     android:text="어쩔시고저쩔시고"
                     android:textColor="#858585"
                     android:textSize="12sp" />

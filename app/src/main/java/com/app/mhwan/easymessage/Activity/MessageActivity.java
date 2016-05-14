@@ -1,9 +1,13 @@
 package com.app.mhwan.easymessage.Activity;
 
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,34 +26,52 @@ import android.widget.Toast;
 
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.CustomBase.DLog;
+import com.app.mhwan.easymessage.CustomBase.MessageDBHelper;
 import com.app.mhwan.easymessage.CustomBase.MessageManager;
+import com.app.mhwan.easymessage.CustomBase.NewMessageListener;
 import com.app.mhwan.easymessage.CustomBase.RecyclerItemClickListener;
 import com.app.mhwan.easymessage.CustomBase.RequestPermission;
+import com.app.mhwan.easymessage.CustomBase.SMSReceiver;
+import com.app.mhwan.easymessage.CustomBase.ScheduleMessageDBHelper;
+import com.app.mhwan.easymessage.CustomBase.SoftKeyboardStateWatcher;
 import com.app.mhwan.easymessage.CustomView.MessageAdapter;
 import com.app.mhwan.easymessage.CustomView.MessageItem;
 import com.app.mhwan.easymessage.R;
 
 import java.util.ArrayList;
 
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends AppCompatActivity implements NewMessageListener{
     private String uName, uNum;
     private EditText mInputtext;
     private boolean issend = false;
     private ArrayList<MessageItem> messageItems;
     private MessageAdapter adapter;
-
+    private SMSReceiver receiver;
+    private MessageDBHelper messageDBHelper;
+    private RecyclerView recyclerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         uName = getIntent().getStringExtra(AppUtility.BasicInfo.U_NAME);
         uNum = getIntent().getStringExtra(AppUtility.BasicInfo.U_NUMBER);
+        messageDBHelper = new MessageDBHelper(this);
+        messageDBHelper.changeMessageReadStatus(uNum);
+        NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        manager.cancel(3);
         initToolbar(uName, uNum);
         initView();
     }
 
     private void initView() {
         mInputtext = (EditText) findViewById(R.id.message_input);
+        mInputtext.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                DLog.d("keboard changed");
+                recyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
+            }
+        });
         findViewById(R.id.message_send_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,12 +82,14 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager manager = new LinearLayoutManager(this);
         //항상 스크롤은 마지막아이템에
-        manager.setStackFromEnd(true);
+        //manager.setStackFromEnd(true);
         recyclerView.setLayoutManager(manager);
-        addItem();
+        DLog.i("number : "+uNum);
+        messageItems = messageDBHelper.getAllMessageList(uNum);
+        DLog.i("size : "+messageItems.size());
         adapter = new MessageAdapter(this, messageItems);
         recyclerView.setAdapter(adapter);
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
@@ -79,37 +103,48 @@ public class MessageActivity extends AppCompatActivity {
                 createOptionDialog(position).show();
             }
         }));
+        recyclerView.scrollToPosition(adapter.getItemCount()-1);
 
+        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                DLog.d("Scroll changed !!" + newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                DLog.d("on scrolled" + dx+", "+dy);
+            }
+        });
+        //소프트 키보드 상태변화 리스너
+        new SoftKeyboardStateWatcher(findViewById(R.id.root_layout), new SoftKeyboardStateWatcher.SoftKeyboardStateListener() {
+            @Override
+            public void onSoftKeyboardOpened(int keyboardHeightInPx) {
+                DLog.d("key board is open!!!");
+                recyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
+            }
+
+            @Override
+            public void onSoftKeyboardClosed() {
+                DLog.d("key board is closed!!!");
+            }
+        });
     }
+
 
     private void sendMessage(){
         if (new RequestPermission(MessageActivity.this, 0).isPermission(findViewById(R.id.root_layout))){
             ArrayList<String> list = new ArrayList<String>();
             list.add(uNum);
             MessageManager manager = new MessageManager(list, mInputtext.getText().toString());
-            manager.sendMessage();
+            manager.setContext(MessageActivity.this);
+            manager.sendMessage(true);
             issend = true;
             mInputtext.setText("");
-        }
-    }
-    private void addItem() {
-        messageItems = new ArrayList<MessageItem>();
-        for (int i = 0; i < 12; i++) {
-            for (int j = 0; j < 2; j++) {
-                MessageItem item = new MessageItem();
-                item.setmTime("오전 11:30");
-                item.setnPhNum("01050574876");
-                item.setmColor_id(14);
-                //받음
-                if (i % 2 == 0) {
-                    item.setmType(1);
-                    item.setmContent((i==10)?"용꼬리를 잘랐더니 뱀꼬리가 되고 뱀꼬리를 쥐가 잘랐더니 쥐가 쥐도새도 모르게 ":"내용내용내용내용ㅇ요용용요고고고고고노");
-                } else {
-                    item.setmType(0);
-                    item.setmContent((i==11)? "그으대 키어긔 치이난 사랑이 내 안을 파고드는 카시이가 되어 제바알알 가라고오ㅗ오옹 아주 카라고 애써어도오 나를 괴로피는데에엥":"내용내용");
-                }
-                messageItems.add(item);
-            }
+            receiveNewMessage();
+            recyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
         }
     }
 
@@ -124,8 +159,12 @@ public class MessageActivity extends AppCompatActivity {
                 closeDialog();
             }
         });
-        getSupportActionBar().setTitle(name);
-        getSupportActionBar().setSubtitle(number);
+        if (name!=null) {
+            getSupportActionBar().setTitle(name);
+            getSupportActionBar().setSubtitle(AppUtility.getAppinstance().changeNumberFormat(number));
+        }
+        else
+            getSupportActionBar().setTitle(AppUtility.getAppinstance().changeNumberFormat(number));
     }
 
     private void finishActivity() {
@@ -143,8 +182,40 @@ public class MessageActivity extends AppCompatActivity {
                 switch (which) {
                     case 0:
                         dialog.dismiss();
-                        adapter.removeMessage(position);
-                        Toast.makeText(MessageActivity.this, getString(R.string.message_delete_successfully), Toast.LENGTH_SHORT).show();
+                        if (messageItems.get(position).getRequest_code() < 0) {
+                            messageDBHelper.removeMessage(messageItems.get(position).getId());
+                            adapter.removeMessage(position);
+                            Toast.makeText(MessageActivity.this, getString(R.string.message_delete_successfully), Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            AlertDialog.Builder sbuilder = new AlertDialog.Builder(MessageActivity.this);
+                            sbuilder.setTitle(getString(R.string.delete_schedulemessage_title));
+                            sbuilder.setMessage(getString(R.string.delete_schedulemessage_content));
+                            sbuilder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            sbuilder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
+                                    PendingIntent pendingIntent = PendingIntent.getBroadcast(MessageActivity.this, messageItems.get(position).getRequest_code(), intent, 0);
+                                    AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+                                    alarmManager.cancel(pendingIntent);
+                                    pendingIntent.cancel();
+                                    ScheduleMessageDBHelper scheduleMessageDBHelper = new ScheduleMessageDBHelper(MessageActivity.this);
+                                    scheduleMessageDBHelper.editIsSendSchedule(messageItems.get(position).getRequest_code(), true);
+                                    messageDBHelper.removeMessage(messageItems.get(position).getId());
+                                    adapter.removeMessage(position);
+                                    dialog.dismiss();
+
+                                    Toast.makeText(MessageActivity.this, getString(R.string.schedule_message_cancel_successfully), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            sbuilder.create().show();
+                        }
                         break;
                     case 1:
                         dialog.dismiss();
@@ -157,10 +228,11 @@ public class MessageActivity extends AppCompatActivity {
                                 Intent intent = new Intent(MessageActivity.this, SendSMSActivity.class);
                                 intent.putExtra(AppUtility.BasicInfo.SEND_TYPE, which);
                                 intent.putExtra(AppUtility.BasicInfo.SEND_PHONE_NUMBER, -1);
-                                intent.putExtra(AppUtility.BasicInfo.SEND_CONTENT, messageItems.get(position).getmContent());
+                                intent.putExtra(AppUtility.BasicInfo.SEND_CONTENT, messageItems.get(position).getContent());
                                 startActivityForResult(intent, AppUtility.BasicInfo.SEND_REQUEST);
                                 dialog.dismiss();
-                                finish();
+                                issend = true;
+                                finishActivity();
                             }
                         });
                         mBuilder.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -172,13 +244,13 @@ public class MessageActivity extends AppCompatActivity {
                         mBuilder.create().show();
                         break;
                     case 2:
-                        setClipboard(messageItems.get(position).getmContent());
+                        setClipboard(messageItems.get(position).getContent());
                         Toast.makeText(getApplicationContext(), getString(R.string.message_copy_clipboard), Toast.LENGTH_SHORT).show();
                         break;
                     case 3:
                         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                         sharingIntent.setType("text/plain");
-                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, messageItems.get(position).getmContent());
+                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, messageItems.get(position).getContent());
                         startActivity(Intent.createChooser(sharingIntent, getString(R.string.message_option_share)));
                         break;
                 }
@@ -293,7 +365,9 @@ public class MessageActivity extends AppCompatActivity {
                     startActivity(new Intent("android.intent.action.CALL", Uri.parse("tel:" + uNum)));
                 break;
             case R.id.sub_delete_all:
+                messageDBHelper.removeAllMessage(uNum);
                 adapter.removeAllMessage();
+                Toast.makeText(MessageActivity.this, getString(R.string.message_delete_successfully), Toast.LENGTH_SHORT).show();
                 break;
             case R.id.menu_search:
                 DLog.i("click search");
@@ -301,5 +375,29 @@ public class MessageActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //리시버 등록
+        if (receiver == null){
+            IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+            intentFilter.addAction(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
+            receiver = new SMSReceiver(this);
+            registerReceiver(receiver, intentFilter);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void receiveNewMessage() {
+        DLog.d("call_receive_new!!!");
+        adapter.updateAllMessage(messageDBHelper.getAllMessageList(uNum));
     }
 }

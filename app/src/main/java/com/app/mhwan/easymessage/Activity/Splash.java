@@ -53,7 +53,7 @@ public class Splash extends Activity {
         fadeIn.setStartOffset(900);
         set.addAnimation(fadeIn);
         bg.startAnimation(set);*/
-        if (new RequestPermission(this, 2).isPermission(findViewById(R.id.root_splash)))
+        if (new RequestPermission(this, 2).isPermission(findViewById(R.id.root_splash)) && new RequestPermission(this, 3).isPermission(findViewById(R.id.root_splash)))
             handler.postDelayed(startMainAcitivity, 1100);
     }
 
@@ -73,6 +73,7 @@ public class Splash extends Activity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case AppUtility.BasicInfo.REQUEST_READ_CONTACT :
+            case AppUtility.BasicInfo.REQUEST_PHONE_STATE :
                 //권한을 승인한경우
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     return;

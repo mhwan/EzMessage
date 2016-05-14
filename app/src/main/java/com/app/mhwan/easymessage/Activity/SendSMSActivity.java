@@ -33,14 +33,17 @@ import android.widget.Toast;
 import com.app.mhwan.easymessage.CustomBase.AppContext;
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.CustomBase.DLog;
+import com.app.mhwan.easymessage.CustomBase.MessageDBHelper;
 import com.app.mhwan.easymessage.CustomBase.ScheduleMessageDBHelper;
 import com.app.mhwan.easymessage.CustomBase.MessageManager;
 import com.app.mhwan.easymessage.CustomBase.RequestPermission;
 import com.app.mhwan.easymessage.CustomBase.ScheduleMessageItem;
 import com.app.mhwan.easymessage.CustomView.ContactItem;
 import com.app.mhwan.easymessage.CustomView.ContactsChipsView;
+import com.app.mhwan.easymessage.CustomView.MessageItem;
 import com.app.mhwan.easymessage.CustomView.RandomProfileIcon;
 import com.app.mhwan.easymessage.R;
+import com.mogua.localization.KoreanTextMatcher;
 import com.tokenautocomplete.FilteredArrayAdapter;
 import com.tokenautocomplete.TokenCompleteTextView;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -83,7 +86,6 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
         else
             DLog.e("bundle : null");
         dbHelper = new ScheduleMessageDBHelper(this);
-
         initToolbar();
         initChipsView(temp_Id);
         initContent();
@@ -123,7 +125,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
                 schedule_window.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        openDateTimePicker(schedule);
+                        openDateTimePicker();
                     }
                 });
                 multi_input.setFocusable(false);
@@ -259,7 +261,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
             @Override
             protected boolean keepObject(ContactItem obj, String mask) {
                 mask = mask.toLowerCase();
-                return obj.getUser_Name().contains(mask) || obj.getUser_phNumber().contains(mask) || obj.getPhNumberChanged().contains(mask);
+                return obj.getUser_Name().contains(mask) || obj.getUser_phNumber().contains(mask) || obj.getPhNumberChanged().contains(mask) || KoreanTextMatcher.isMatch(obj.getUser_Name(), mask);
             }
         };
         chipsView.setAdapter(adapter);
@@ -293,7 +295,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
         });
     }
 
-    private void openDateTimePicker(final TextView schedule) {
+    private void openDateTimePicker() {
         scheduled_date = Calendar.getInstance();
         DatePickerDialog datepicker = DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -408,7 +410,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
         ArrayList<String> number = new ArrayList<String>();
         List<ContactItem> people  = chipsView.getObjects();
         for (ContactItem cPeople : people)
-            number.add(cPeople.getUser_phNumber());
+            number.add(cPeople.getPhNumberChanged());
         return number;
     }
 
@@ -420,7 +422,8 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
             switch (sendType) {
                 case 0:
                     MessageManager messageManager = new MessageManager(numberList, msContent);
-                    if (messageManager.sendMessage())
+                    messageManager.setContext(SendSMSActivity.this);
+                    if (messageManager.sendMessage(true))
                         finishedSendSMS(SMS_RESULT.SEND_SUCCESS);
                     else
                         finishedSendSMS(SMS_RESULT.SEND_FAIL);
@@ -439,6 +442,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
                         item.setIssend(false);
                         item.setTimemillis(scheduled_date.getTimeInMillis());
                         int request = dbHelper.addSchedule(item);
+                        addScheduleToDB(numberList, msContent, scheduled_date.getTime(), request);
                         Intent intent = new Intent(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
                         intent.putExtra(AppUtility.BasicInfo.SEND_SCHEDULE_PHNUM, numberList);
                         intent.putExtra(AppUtility.BasicInfo.SEND_SCHEDULE_MESSAGE, msContent);
@@ -466,6 +470,24 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
         }
     }
 
+    private void addScheduleToDB(ArrayList<String> numberlist, String content, Date date, int request){
+        SimpleDateFormat dateFormat = new SimpleDateFormat(AppUtility.BasicInfo.DB_DATETIME_FORMAT);
+        MessageDBHelper messageDBHelper = new MessageDBHelper(this);
+        for (String number : numberlist){
+            long[] ids = AppUtility.getAppinstance().getPhotoPersonId(number.replace("-", ""));
+            MessageItem item = new MessageItem();
+            item.setPh_number(number.replace("-", ""));
+            item.setContent(content);
+            item.setTime(dateFormat.format(date));
+            item.setType(0);
+            item.setIs_last_message(true);
+            item.setIs_read(true);
+            item.setRequest_code(request);
+
+            messageDBHelper.addMessage(item);
+        }
+    }
+
     private void finishedSendSMS(SMS_RESULT result){
         if (result == SMS_RESULT.SEND_SUCCESS)
             setResult(RESULT_OK);
@@ -490,6 +512,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
             this.content = content;
             messageManager = new MessageManager();
             messageManager.setMessage(numberList, this.content);
+            messageManager.setContext(SendSMSActivity.this);
         }
 
         //전송전
@@ -534,7 +557,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
                     during_second = 1800;
                 for (int i = 0; i < count; i++) {
                     publishProgress(i+1);
-                    issuccesfull = messageManager.sendMessage();
+                    issuccesfull = messageManager.sendMessage(true);
                     if (i != count-1) {
                         second += during_second;
                         Thread.sleep(second);

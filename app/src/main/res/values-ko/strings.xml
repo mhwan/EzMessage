@@ -56,4 +56,10 @@
     <string name="message_delete_successfully">메시지가 삭제되었습니다.</string>
     <string name="yes_Delete">넵, 지워버려요</string>
     <string name="message_copy_clipboard">메시지가 클립보드에 복사되었습니다.</string>
+    <string name="phone_state_permission_request">이 앱을 실행시키려면 휴대폰 상태 읽기 권한이 필요합니다.</string>
+    <string name="me">나</string>
+    <string name="delete_schedulemessage_title">예약 메시지를 삭제하시겠습니까?</string>
+    <string name="delete_schedulemessage_content">이 예약 메시지는 취소됩니다.</string>
+    <string name="yes">확인</string>
+    <string name="schedule_message_cancel_successfully">예약 메시지가 취소되었습니다.</string>
 </resources>

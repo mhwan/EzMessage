@@ -1,86 +1,96 @@
 package com.app.mhwan.easymessage.CustomView;
 
 /**
- * Created by Mhwan on 2016. 4. 29..
+ * Created by Mhwan on 2016. 5. 10..
  */
 
 /**
- * 메시지
- * string 휴대폰번호(상대방), 내용, 시간
- * long person_id, photo_id;
- * bool isread 읽었는지에 대한 상태 (받은메시지의 첫상태는 읽지 않음, 들어왔을때 읽음 처리됨, 보낸 메시지는 무조건 읽음 처리)
- * int type 0 : 내가 보낸 메시지, 1: 받은메시지
+ * photo, person id (저장된 사진을 얻기위함)
+ * type (0: 내가 보냄, 1: 받음)
+ * request_code (예약메시지 요청코드, 예약이 아닐경우 -1)
+ * is_read (true(1) 읽음 - 보낸 메시지일 경우, 읽었을경우, false(0) 읽지않음 - 받은메시지가 처음 도착했을경우)
+ * is_last 각 번호와 주고받은 마지막 메시지 (db에 새로 저장할경우 무조건 last)
  */
 public class MessageItem {
-    private String nPhNum, mContent, mTime;
-    private long mPerson_id, mPhoto_id;
-    private int mType;
-    private int mColor_id;
-    private boolean isread;
+    protected String ph_number, content, time;
+    protected int type, request_code;
+    protected boolean is_read, is_last_message;
+    private int id;
 
-    public MessageItem(){}
-
-    public boolean isread() {
-        return isread;
+    public MessageItem() {
     }
 
-    public void setIsread(boolean isread) {
-        this.isread = isread;
+    public MessageItem(int id, String content, boolean is_last_message, boolean is_read, String ph_number, String time, int type) {
+        this.id = id;
+        this.content = content;
+        this.is_last_message = is_last_message;
+        this.is_read = is_read;
+        this.ph_number = ph_number;
+        this.time = time;
+        this.type = type;
     }
 
-    public String getmContent() {
-        return mContent;
+
+    public int getId(){
+        return id;
+    }
+    public void setId(int id){
+        this.id = id;
     }
 
-    public void setmContent(String mContent) {
-        this.mContent = mContent;
+    public String getContent() {
+        return content;
     }
 
-    public long getmPerson_id() {
-        return mPerson_id;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public void setmPerson_id(long mPerson_id) {
-        this.mPerson_id = mPerson_id;
+    public boolean is_last_message() {
+        return is_last_message;
     }
 
-    public long getmPhoto_id() {
-        return mPhoto_id;
+    public void setIs_last_message(boolean is_last_message) {
+        this.is_last_message = is_last_message;
     }
 
-    public void setmPhoto_id(long mPhoto_id) {
-        this.mPhoto_id = mPhoto_id;
+    public boolean is_read() {
+        return is_read;
     }
 
-    public String getmTime() {
-        return mTime;
+    public void setIs_read(boolean is_read) {
+        this.is_read = is_read;
     }
 
-    public void setmTime(String mTime) {
-        this.mTime = mTime;
+    public String getPh_number() {
+        return ph_number;
     }
 
-    public int getmType() {
-        return mType;
+    public void setPh_number(String ph_number) {
+        this.ph_number = ph_number;
     }
 
-    public void setmType(int mType) {
-        this.mType = mType;
+    public String getTime() {
+        return time;
     }
 
-    public String getnPhNum() {
-        return nPhNum;
+    public void setTime(String time) {
+        this.time = time;
     }
 
-    public int getmColor_id() {
-        return mColor_id;
+    public int getType() {
+        return type;
     }
 
-    public void setmColor_id(int mColor_id) {
-        this.mColor_id = mColor_id;
+    public void setType(int type) {
+        this.type = type;
     }
 
-    public void setnPhNum(String nPhNum) {
-        this.nPhNum = nPhNum;
+    public int getRequest_code() {
+        return request_code;
+    }
+
+    public void setRequest_code(int request_code) {
+        this.request_code = request_code;
     }
 }

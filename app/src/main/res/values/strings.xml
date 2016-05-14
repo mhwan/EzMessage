@@ -52,7 +52,13 @@
     <string name="message_option_copy">Copy</string>
     <string name="message_option_share">Share</string>
     <string name="message_delete_successfully">Succeed to delete message.</string>
+    <string name="schedule_message_cancel_successfully">Succeed to cancel schedule message.</string>
     <string name="message_delete_failed">Failed to delete message.</string>
     <string name="yes_Delete">YES, DELETE</string>
+    <string name="yes">Yes</string>
+    <string name="me">Me</string>
+    <string name="delete_schedulemessage_title">Delete schedule message?</string>
+    <string name="delete_schedulemessage_content">This schedule message will be cancel.</string>
+    <string name="phone_state_permission_request">Phone state permission is required to launch this app.</string>
     <string name="message_copy_clipboard">Message has been copied to the clipboard.</string>
 </resources>

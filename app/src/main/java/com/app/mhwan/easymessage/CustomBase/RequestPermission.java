@@ -18,8 +18,8 @@ import com.app.mhwan.easymessage.R;
 public class RequestPermission {
     private int permission_type;
     private Context context;
-    private final String[] MANIFEST_PERMISSION = {Manifest.permission.SEND_SMS, Manifest.permission.CALL_PHONE, Manifest.permission.READ_CONTACTS};
-    public static final int[] REQUEST_PERMISSION = {AppUtility.BasicInfo.REQUEST_SEND_SMS, AppUtility.BasicInfo.REQUEST_CALL, AppUtility.BasicInfo.REQUEST_READ_CONTACT};
+    private final String[] MANIFEST_PERMISSION = {Manifest.permission.SEND_SMS, Manifest.permission.CALL_PHONE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_PHONE_STATE};
+    public static final int[] REQUEST_PERMISSION = {AppUtility.BasicInfo.REQUEST_SEND_SMS, AppUtility.BasicInfo.REQUEST_CALL, AppUtility.BasicInfo.REQUEST_READ_CONTACT, AppUtility.BasicInfo.REQUEST_PHONE_STATE};
     private String[] snackkbar_message;
     public RequestPermission(Context context, int permission_type){
         this.context = context;
@@ -29,7 +29,7 @@ public class RequestPermission {
 
     public boolean isPermission(View view){
         if (ActivityCompat.checkSelfPermission(context, MANIFEST_PERMISSION[permission_type])!= PackageManager.PERMISSION_GRANTED) {
-            if (permission_type == 2) {
+            if (permission_type == 2 || permission_type ==3) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage(snackkbar_message[permission_type])
                         .setCancelable(false)

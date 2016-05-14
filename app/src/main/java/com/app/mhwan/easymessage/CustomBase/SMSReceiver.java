@@ -10,21 +10,42 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
+import android.telephony.SmsMessage;
 
 import com.app.mhwan.easymessage.Activity.MainActivity;
+import com.app.mhwan.easymessage.Activity.MessageActivity;
+import com.app.mhwan.easymessage.CustomView.MessageItem;
 import com.app.mhwan.easymessage.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Mhwan on 2016. 4. 2..
  */
 public class SMSReceiver extends BroadcastReceiver {
+    private NewMessageListener listener;
     private ScheduleMessageDBHelper dbHelper;
+    private MessageDBHelper messageDBHelper;
+
+    public SMSReceiver() {
+    }
+
+    public SMSReceiver(NewMessageListener listener) {
+        this.listener = listener;
+    }
+    public void setListener(NewMessageListener listener){ this.listener = listener; }
+    public String getListnerClassName(){
+        DLog.d("listener name : "+listener.getClass().getName().toString());
+        return listener.getClass().getName().toString();
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String string = intent.getAction();
         dbHelper = new ScheduleMessageDBHelper(context);
+        messageDBHelper = new MessageDBHelper(context);
         //예약문자인 경우
         if (string.equals(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION)) {
             ArrayList<String> phNum = intent.getStringArrayListExtra(AppUtility.BasicInfo.SEND_SCHEDULE_PHNUM);
@@ -33,12 +54,21 @@ public class SMSReceiver extends BroadcastReceiver {
             DLog.d("예약문자 : " + phNum + ", " + msContent + ", " + request);
             dbHelper.editIsSendSchedule(request, true);
             MessageManager manager = new MessageManager(phNum, msContent);
-            boolean isSuccessSend = manager.sendMessage();
+            boolean isSuccessSend = manager.sendMessage(false);
+            messageDBHelper.changeMessageScheduleStatus(request);
 
             NotificationManager nManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
             if (isSuccessSend) {
-                Intent intent1 = new Intent(context, MainActivity.class);
-                intent1.putExtra(AppUtility.BasicInfo.KEY_INTENT_SCHEDULE, false);
+                Intent intent1;
+                if (phNum.size()>1) {
+                    intent1 = new Intent(context, MainActivity.class);
+                    intent1.putExtra(AppUtility.BasicInfo.KEY_INTENT_SCHEDULE, false);
+                }
+                else {
+                    intent1 = new Intent(context, MessageActivity.class);
+                    intent1.putExtra(AppUtility.BasicInfo.U_NAME, AppUtility.getAppinstance().getUserName(phNum.get(0)));
+                    intent1.putExtra(AppUtility.BasicInfo.U_NUMBER, phNum.get(0));
+                }
                 android.support.v4.app.NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                         .setSmallIcon(R.mipmap.ic_notification)
                         .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
@@ -50,16 +80,17 @@ public class SMSReceiver extends BroadcastReceiver {
                         .setContentIntent(PendingIntent.getActivity(context, 0, intent1, PendingIntent.FLAG_UPDATE_CURRENT));
                 nManager.notify(3, builder.build());
 
+                if (listener != null)
+                    listener.receiveNewMessage();
             }
-        }
-        else if (string.equals("android.intent.action.BOOT_COMPLETED")) {
+        } else if (string.equals("android.intent.action.BOOT_COMPLETED")) {
             ArrayList<ScheduleMessageItem> itemArrayList = dbHelper.getAllScheduleMessage();
-            if (itemArrayList.size()>0) {
+            if (itemArrayList.size() > 0) {
                 for (ScheduleMessageItem item : itemArrayList) {
                     //현재시간보다 예약시간이 뒤에 있을때 펜딩인텐트에 등록, 현재시간보다 이전이라면 메시지 전송상태를 보낸것으로 체크
-                    if (System.currentTimeMillis() <= item.gettimemillis() && !item.getIssend()){
+                    if (System.currentTimeMillis() <= item.gettimemillis() && !item.getIssend()) {
                         int request = item.getId();
-                        DLog.i("recovery message : "+request+", "+item.getNumberArraylist()+", "+item.getContent());
+                        DLog.i("recovery message : " + request + ", " + item.getNumberArraylist() + ", " + item.getContent());
                         Intent mIntent = new Intent(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
                         mIntent.putExtra(AppUtility.BasicInfo.SEND_SCHEDULE_PHNUM, item.getNumberArraylist());
                         mIntent.putExtra(AppUtility.BasicInfo.SEND_SCHEDULE_MESSAGE, item.getContent());
@@ -68,32 +99,29 @@ public class SMSReceiver extends BroadcastReceiver {
                         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                             alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.gettimemillis(), pendingIntent);
-                        }
-                        else {
+                        } else {
                             alarmManager.set(AlarmManager.RTC_WAKEUP, item.gettimemillis(), pendingIntent);
                         }
-                    }
-                    else
+                    } else {
                         dbHelper.editIsSendSchedule(item.getId(), true);
+                        messageDBHelper.changeMessageScheduleStatus(item.getId());
+                    }
                 }
             }
-        }
-        else if (string.equals("android.provider.Telephony.SMS_RECEIVED")){
+        } else if (string.equals("android.provider.Telephony.SMS_RECEIVED")) {
             Bundle bundle = intent.getExtras();
-            if (bundle != null){
-                /*
-                Object [] pdusObj = (Object[])bundle.get("pdus");
-                if (pdusObj != null){
+            if (bundle != null) {
+                Object[] pdusObj = (Object[]) bundle.get("pdus");
+                if (pdusObj != null) {
                     SmsMessage[] smsMessage = new SmsMessage[pdusObj.length];
-                    String message="";
+                    String message = "";
                     String number = null;
                     Date date = null;
-                    for (int i=0; i<smsMessage.length; i++){
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                    for (int i = 0; i < smsMessage.length; i++) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             String format = bundle.getString("format");
                             smsMessage[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i], format);
-                        }
-                        else
+                        } else
                             smsMessage[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
                         //메시지는 길이에따라 쪼개질 수 있음. 번호와 시간은 처음에만 저장.
                         message += smsMessage[i].getDisplayMessageBody();
@@ -102,9 +130,21 @@ public class SMSReceiver extends BroadcastReceiver {
                             date = new Date(smsMessage[i].getTimestampMillis());
                         }
                     }
-                    SimpleDateFormat format = new SimpleDateFormat(AppUtility.BasicInfo.GENERAL_DATETIME_FORMAT);
+                    DLog.d("new : "+message+" "+number);
+                    SimpleDateFormat format = new SimpleDateFormat(AppUtility.BasicInfo.DB_DATETIME_FORMAT);
                     String sDate = format.format(date);
-                }*/
+                    MessageItem item = new MessageItem();
+                    item.setPh_number(number.replace("-", ""));
+                    item.setContent(message);
+                    item.setTime(sDate);
+                    item.setIs_read(false);
+                    item.setIs_last_message(true);
+                    item.setType(1);
+                    item.setRequest_code(-1);
+                    messageDBHelper.addMessage(item);
+                    if (listener != null)
+                        listener.receiveNewMessage();
+                }
             }
         }
     }

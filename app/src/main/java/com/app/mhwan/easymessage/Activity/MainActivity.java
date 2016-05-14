@@ -8,7 +8,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         });
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+        adapter.notifyDataSetChanged();
         Bundle bundle = getIntent().getExtras();
         if ((bundle!=null) ? bundle.getBoolean(AppUtility.BasicInfo.KEY_INTENT_SCHEDULE) : true) {
             //탭레이아웃에 아이콘 달아준다.
@@ -137,10 +139,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public FloatingActionButton getFloatingActionButton(){
-        if (floatingActionButton == null)
-            DLog.e("fab : null");
-        else
-            DLog.i("fab : not null");
         return floatingActionButton;
     }
 
@@ -149,9 +147,11 @@ public class MainActivity extends AppCompatActivity {
         ((TextView) toolbar.findViewById(R.id.toolbar_title)).setText(title[position]);
     }
 
-    public class TabpagerAdapter extends FragmentPagerAdapter {
+    public class TabpagerAdapter extends FragmentStatePagerAdapter {
+        private FragmentManager fm;
         public TabpagerAdapter(FragmentManager fm) {
             super(fm);
+            this.fm = fm;
         }
 
         @Override
@@ -173,6 +173,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             return title.length;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            super.destroyItem(container, position, object);
+            FragmentTransaction bt = fm.beginTransaction();
+            bt.remove((Fragment)object);
+            bt.commit();
         }
     }
 
@@ -204,12 +212,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AppUtility.BasicInfo.SEND_REQUEST) {
-            if (resultCode == RESULT_OK)
+            if (resultCode == RESULT_OK) {
                 Toast.makeText(getApplicationContext(), getResources().getString(R.string.success_message_send), Toast.LENGTH_SHORT).show();
+                activityResultListner.onActivityResults(requestCode, resultCode, data);
+            }
             else if (resultCode == AppUtility.BasicInfo.SEND_ERROR)
                 Toast.makeText(getApplicationContext(), getResources().getString(R.string.fail_message_send), Toast.LENGTH_SHORT).show();
-            else if (resultCode == AppUtility.BasicInfo.SEND_RESERVED_SUCCESS)
+            else if (resultCode == AppUtility.BasicInfo.SEND_RESERVED_SUCCESS) {
                 Toast.makeText(getApplicationContext(), getResources().getString(R.string.success_message_reserved), Toast.LENGTH_SHORT).show();
+                activityResultListner.onActivityResults(requestCode, resultCode, data);
+            }
             else
                 DLog.d("sender, close");
         }
