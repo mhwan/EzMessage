@@ -15,22 +15,14 @@ public class MessageItem {
     protected String ph_number, content, time;
     protected int type, request_code;
     protected boolean is_read, is_last_message;
-    private int id;
+    private int id, color_id = -1;
 
-    public MessageItem() {
+    public int getColor_id(){
+        return color_id;
     }
-
-    public MessageItem(int id, String content, boolean is_last_message, boolean is_read, String ph_number, String time, int type) {
-        this.id = id;
-        this.content = content;
-        this.is_last_message = is_last_message;
-        this.is_read = is_read;
-        this.ph_number = ph_number;
-        this.time = time;
-        this.type = type;
+    public void setColor_id(int color_id){
+        this.color_id = color_id;
     }
-
-
     public int getId(){
         return id;
     }

@@ -34,7 +34,9 @@ public class MainActivity extends AppCompatActivity {
     private int[] ic_resource = {R.drawable.selector_contacts, R.drawable.selector_message};
     private BackKeyPressedListner backKeyPressedListner;
     private FloatingActionButton floatingActionButton;
+    private NewSignListener newSignListener;
     private View [] views;
+    private View signview;
     private ActivityResultListner activityResultListner;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,17 +112,21 @@ public class MainActivity extends AppCompatActivity {
         //앱 초기실행시 첫번째 탭이 선택이 되지 않는 현상 해결하기 위해서. 처음에는 직접 리소스 지정
         switch (type){
             case DEFAULT_FIRST:
+                DLog.d("init tab!!");
                 views = new View[2];
                 views[0] = getLayoutInflater().inflate(R.layout.custom_tab, null);
                 views[0].findViewById(R.id.icon).setBackgroundResource(R.mipmap.ic_contact_select);
                 tabLayout.getTabAt(0).setCustomView(views[0]);
                 views[1] = getLayoutInflater().inflate(R.layout.custom_tab, null);
                 views[1].findViewById(R.id.icon).setBackgroundResource(R.mipmap.ic_recievemessage_none);
+                //views[1].findViewById(R.id.new_sign).setVisibility((newSignListener.getNewSignCount() > 0)? View.VISIBLE : View.GONE );
+                signview = views[1].findViewById(R.id.new_sign);
                 tabLayout.getTabAt(1).setCustomView(views[1]);
                 break;
             case NOT_FIST:
                 for (int i = 0; i < 2; i++) {
                     views[i].findViewById(R.id.icon).setBackgroundResource(ic_resource[i]);
+                    views[i].findViewById(R.id.new_sign).setVisibility((i>0 && newSignListener.getNewSignCount() > 0)? View.VISIBLE : View.GONE );
                     tabLayout.getTabAt(i).setCustomView(views[i]);
                 }
                 break;
@@ -129,6 +135,9 @@ public class MainActivity extends AppCompatActivity {
                 for (int i=0; i<2; i++){
                     views[i] = getLayoutInflater().inflate(R.layout.custom_tab, null);
                     views[i].findViewById(R.id.icon).setBackgroundResource(ic_resource[i]);
+                    //views[i].findViewById(R.id.new_sign).setVisibility((i>0 && newSignListener.getNewSignCount() > 0)? View.VISIBLE : View.GONE );
+                    if (i == 1)
+                        signview = views[i].findViewById(R.id.new_sign);
                     tabLayout.getTabAt(i).setCustomView(views[i]);
                 }
         }
@@ -142,6 +151,9 @@ public class MainActivity extends AppCompatActivity {
         return floatingActionButton;
     }
 
+    public View getSignview(){
+        return signview;
+    }
     private void setActionbarTitle(int position) {
         DLog.d("name : "+ title[position]);
         ((TextView) toolbar.findViewById(R.id.toolbar_title)).setText(title[position]);
@@ -200,11 +212,19 @@ public class MainActivity extends AppCompatActivity {
         this.activityResultListner = listner;
     }
 
+    public void setNewSignListener(NewSignListener listener){
+        this.newSignListener = listener;
+    }
+
     public interface BackKeyPressedListner {
         void onBackPressed();
     }
     public interface ActivityResultListner{
         void onActivityResults(int requestcode, int resultcode, Intent data);
+    }
+
+    public interface NewSignListener{
+        int getNewSignCount();
     }
 
     //메시지함에서 나왔을때라면 메시지를 새로 업데이트 하기위해 프래그먼트에서 결과 처리

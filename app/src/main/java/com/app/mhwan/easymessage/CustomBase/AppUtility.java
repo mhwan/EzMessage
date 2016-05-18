@@ -310,6 +310,28 @@ public class AppUtility {
     }
 
     /**
+     * db에 저장될 컬러아이디, 연락처에 저장되어있거나 자신의 핸드폰 번호일 경우 -1 반환, 랜덤값 반환
+     * @param ph_number
+     * @return
+     */
+    public int getColorIdtoDB(String ph_number){
+        return (getSaved(ph_number) || getMyPhoneNumber().equals(ph_number))? -1 : random.nextInt(AppContext.getContext().getResources().getIntArray(R.array.user_color).length);
+    }
+
+    public boolean getSaved(String ph_number){
+        boolean issaved = false;
+        ArrayList<ContactItem> list = getContactList();
+        for (ContactItem item : list){
+            if (item.getPhNumberChanged().equals(ph_number)){
+                issaved = true;
+                break;
+            }
+        }
+
+        return issaved;
+    }
+
+    /**
      * color id 반환
      *
      * 자기자신이라면 27, 상대방의 저장된 컬러 아이디 반환 (저장이 안되있다면 랜덤값을 생성하여 반환한다.

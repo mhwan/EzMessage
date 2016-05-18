@@ -25,21 +25,33 @@ import java.util.Date;
  * Created by Mhwan on 2016. 4. 2..
  */
 public class SMSReceiver extends BroadcastReceiver {
-    private NewMessageListener listener;
+    private static NewMessageListener slistener;
     private ScheduleMessageDBHelper dbHelper;
+    private static SMSReceiver smsReceiver;
     private MessageDBHelper messageDBHelper;
+
+    public synchronized static SMSReceiver getSmsReceiver(NewMessageListener listener){
+        if (smsReceiver == null)
+            smsReceiver = new SMSReceiver();
+        slistener = listener;
+
+        return smsReceiver;
+    }
 
     public SMSReceiver() {
     }
 
+
+    /*
     public SMSReceiver(NewMessageListener listener) {
         this.listener = listener;
-    }
-    public void setListener(NewMessageListener listener){ this.listener = listener; }
+    }*/
+    public void setListener(NewMessageListener listener){ slistener = listener; }
+    /*
     public String getListnerClassName(){
         DLog.d("listener name : "+listener.getClass().getName().toString());
         return listener.getClass().getName().toString();
-    }
+    }*/
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -80,8 +92,8 @@ public class SMSReceiver extends BroadcastReceiver {
                         .setContentIntent(PendingIntent.getActivity(context, 0, intent1, PendingIntent.FLAG_UPDATE_CURRENT));
                 nManager.notify(3, builder.build());
 
-                if (listener != null)
-                    listener.receiveNewMessage();
+                if (slistener != null)
+                    slistener.updateNewMessage(false, null);
             }
         } else if (string.equals("android.intent.action.BOOT_COMPLETED")) {
             ArrayList<ScheduleMessageItem> itemArrayList = dbHelper.getAllScheduleMessage();
@@ -133,17 +145,23 @@ public class SMSReceiver extends BroadcastReceiver {
                     DLog.d("new : "+message+" "+number);
                     SimpleDateFormat format = new SimpleDateFormat(AppUtility.BasicInfo.DB_DATETIME_FORMAT);
                     String sDate = format.format(date);
+                    number = number.replace("-", "");
+
                     MessageItem item = new MessageItem();
-                    item.setPh_number(number.replace("-", ""));
+                    item.setPh_number(number);
                     item.setContent(message);
                     item.setTime(sDate);
                     item.setIs_read(false);
                     item.setIs_last_message(true);
                     item.setType(1);
                     item.setRequest_code(-1);
+                    int code = messageDBHelper.getSavedColorId(number);
+                    //-1이라면 db에 저장이 안되있으므로 새로 저장할 코드 생성
+                    item.setColor_id((code < 0)? AppUtility.getAppinstance().getColorIdtoDB(number) : code);
                     messageDBHelper.addMessage(item);
-                    if (listener != null)
-                        listener.receiveNewMessage();
+
+                    if (slistener != null)
+                        slistener.updateNewMessage(true, number);
                 }
             }
         }

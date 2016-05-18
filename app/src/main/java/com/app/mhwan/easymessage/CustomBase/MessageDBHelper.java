@@ -3,6 +3,7 @@ package com.app.mhwan.easymessage.CustomBase;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -25,6 +26,7 @@ public class MessageDBHelper extends SQLiteOpenHelper {
     public static String MESSAGE_KEY_ISREAD = "Is_Read";
     public static String MESSAGE_KEY_ISLAST = "Is_Last_Message";
     public static String MESSAGE_KEY_ISSCHEDULE = "Is_Schedule";
+    public static String MESSAGE_KEY_COLORID = "Color_ID";
 
     public MessageDBHelper(Context context){
         super(context, MESSAGE_DB_NAME, null, 1);
@@ -34,7 +36,7 @@ public class MessageDBHelper extends SQLiteOpenHelper {
         DLog.i("db생성!!");
         String CREATE_MESSAGE_TABLE = "CREATE TABLE IF NOT EXISTS "+Message_List_TABLE_NAME+" ("+
                 MESSAGE_KEY_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+MESSAGE_KEY_NUMBER+" TEXT NOT NULL, "+MESSAGE_KEY_CONTENT+" TEXT NOT NULL, "+MESSAGE_KEY_TIME+" TEXT NOT NULL, "+
-                MESSAGE_KEY_TYPE+" INTEGER NOT NULL, "+MESSAGE_KEY_ISREAD+" INTEGER NOT NULL, "+MESSAGE_KEY_ISLAST+" INTEGER NOT NULL, "+MESSAGE_KEY_ISSCHEDULE+" INTEGER)";
+                MESSAGE_KEY_TYPE+" INTEGER NOT NULL, "+MESSAGE_KEY_ISREAD+" INTEGER NOT NULL, "+MESSAGE_KEY_ISLAST+" INTEGER NOT NULL, "+MESSAGE_KEY_ISSCHEDULE+" INTEGER, "+MESSAGE_KEY_COLORID+" INTEGER)";
         db.execSQL(CREATE_MESSAGE_TABLE);
     }
 
@@ -58,6 +60,7 @@ public class MessageDBHelper extends SQLiteOpenHelper {
         values.put(MESSAGE_KEY_ISREAD, (item.is_read())? 1:0);
         values.put(MESSAGE_KEY_ISLAST, (item.is_last_message())? 1:0);
         values.put(MESSAGE_KEY_ISSCHEDULE, item.getRequest_code());
+        values.put(MESSAGE_KEY_COLORID, item.getColor_id());
         db.insert(Message_List_TABLE_NAME, null, values);
         db.close();
     }
@@ -109,6 +112,7 @@ public class MessageDBHelper extends SQLiteOpenHelper {
                 item.setIs_last_message((cursor.getInt(6)==0)? false : true);
                 item.setRequest_code(cursor.getInt(7));
                 item.setName(AppUtility.getAppinstance().getUserName(cursor.getString(1)));
+                item.setColor_id(cursor.getInt(8));
 
                 list.add(item);
             }while (cursor.moveToNext());
@@ -120,13 +124,13 @@ public class MessageDBHelper extends SQLiteOpenHelper {
 
     private ArrayList<MessageListItem> countNoReadMessage(ArrayList<MessageListItem> list){
         SQLiteDatabase db = this.getReadableDatabase();
-        String queryformat = "SELECT COUNT(*) FROM "+Message_List_TABLE_NAME+" WHERE "+MESSAGE_KEY_NUMBER+" = %s AND "+MESSAGE_KEY_ISREAD+" = \'0\'";
+        String queryformat = "SELECT COUNT(*) FROM "+Message_List_TABLE_NAME+" WHERE "+MESSAGE_KEY_NUMBER+" = \"%s\" AND "+MESSAGE_KEY_ISREAD+" = \'0\'";
         for (int i=0; i < list.size(); i++){
             String phnumber = list.get(i).getPh_number();
-            Cursor cursor = db.rawQuery(String.format(queryformat, phnumber), null);
-            cursor.moveToFirst();
-            list.get(i).setCount_no_read(cursor.getInt(0));
-            cursor.close();
+            int count = (int) DatabaseUtils.longForQuery(db, String.format(queryformat, phnumber), null);
+            DLog.d("query!! "+String.format(queryformat, phnumber));
+            DLog.d(phnumber+" : "+count);
+            list.get(i).setCount_no_read(count);
         }
 
         return list;
@@ -155,12 +159,25 @@ public class MessageDBHelper extends SQLiteOpenHelper {
                 item.setIs_read((cursor.getInt(5)==0)? false : true);
                 item.setIs_last_message((cursor.getInt(6)==0)? false : true);
                 item.setRequest_code(cursor.getInt(7));
-
+                item.setColor_id(cursor.getInt(8));
                 list.add(item);
             }while (cursor.moveToNext());
         }
 
         return list;
+    }
+
+    public int getSavedColorId(String number){
+        ArrayList<MessageListItem> listItems = getAllLastMessageList();
+        int id = -1;
+        for (MessageListItem item : listItems){
+            if (item.getPh_number().equals(number)){
+                id = item.getColor_id();
+                break;
+            }
+        }
+
+        return id;
     }
 
     /**

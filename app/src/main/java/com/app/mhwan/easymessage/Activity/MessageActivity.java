@@ -40,7 +40,7 @@ import com.app.mhwan.easymessage.R;
 
 import java.util.ArrayList;
 
-public class MessageActivity extends AppCompatActivity implements NewMessageListener{
+public class MessageActivity extends AppCompatActivity implements NewMessageListener {
     private String uName, uNum;
     private EditText mInputtext;
     private boolean issend = false;
@@ -49,6 +49,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     private SMSReceiver receiver;
     private MessageDBHelper messageDBHelper;
     private RecyclerView recyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +58,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
         uNum = getIntent().getStringExtra(AppUtility.BasicInfo.U_NUMBER);
         messageDBHelper = new MessageDBHelper(this);
         messageDBHelper.changeMessageReadStatus(uNum);
-        NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         manager.cancel(3);
         initToolbar(uName, uNum);
         initView();
@@ -69,7 +70,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 DLog.d("keboard changed");
-                recyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
+                recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
             }
         });
         findViewById(R.id.message_send_button).setOnClickListener(new View.OnClickListener() {
@@ -87,9 +88,9 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
         //항상 스크롤은 마지막아이템에
         //manager.setStackFromEnd(true);
         recyclerView.setLayoutManager(manager);
-        DLog.i("number : "+uNum);
+        DLog.i("number : " + uNum);
         messageItems = messageDBHelper.getAllMessageList(uNum);
-        DLog.i("size : "+messageItems.size());
+        DLog.i("size : " + messageItems.size());
         adapter = new MessageAdapter(this, messageItems);
         recyclerView.setAdapter(adapter);
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
@@ -103,7 +104,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                 createOptionDialog(position).show();
             }
         }));
-        recyclerView.scrollToPosition(adapter.getItemCount()-1);
+        recyclerView.scrollToPosition(adapter.getItemCount() - 1);
 
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -115,7 +116,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                DLog.d("on scrolled" + dx+", "+dy);
+                DLog.d("on scrolled" + dx + ", " + dy);
             }
         });
         //소프트 키보드 상태변화 리스너
@@ -123,7 +124,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
             @Override
             public void onSoftKeyboardOpened(int keyboardHeightInPx) {
                 DLog.d("key board is open!!!");
-                recyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
+                recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
             }
 
             @Override
@@ -134,8 +135,8 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     }
 
 
-    private void sendMessage(){
-        if (new RequestPermission(MessageActivity.this, 0).isPermission(findViewById(R.id.root_layout))){
+    private void sendMessage() {
+        if (new RequestPermission(MessageActivity.this, 0).isPermission(findViewById(R.id.root_layout))) {
             ArrayList<String> list = new ArrayList<String>();
             list.add(uNum);
             MessageManager manager = new MessageManager(list, mInputtext.getText().toString());
@@ -143,8 +144,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
             manager.sendMessage(true);
             issend = true;
             mInputtext.setText("");
-            receiveNewMessage();
-            recyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
+            updateNewMessage(false, uNum);
         }
     }
 
@@ -159,11 +159,10 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                 closeDialog();
             }
         });
-        if (name!=null) {
+        if (name != null) {
             getSupportActionBar().setTitle(name);
             getSupportActionBar().setSubtitle(AppUtility.getAppinstance().changeNumberFormat(number));
-        }
-        else
+        } else
             getSupportActionBar().setTitle(AppUtility.getAppinstance().changeNumberFormat(number));
     }
 
@@ -186,8 +185,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                             messageDBHelper.removeMessage(messageItems.get(position).getId());
                             adapter.removeMessage(position);
                             Toast.makeText(MessageActivity.this, getString(R.string.message_delete_successfully), Toast.LENGTH_SHORT).show();
-                        }
-                        else {
+                        } else {
                             AlertDialog.Builder sbuilder = new AlertDialog.Builder(MessageActivity.this);
                             sbuilder.setTitle(getString(R.string.delete_schedulemessage_title));
                             sbuilder.setMessage(getString(R.string.delete_schedulemessage_content));
@@ -202,7 +200,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                                 public void onClick(DialogInterface dialog, int which) {
                                     Intent intent = new Intent(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(MessageActivity.this, messageItems.get(position).getRequest_code(), intent, 0);
-                                    AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+                                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                                     alarmManager.cancel(pendingIntent);
                                     pendingIntent.cancel();
                                     ScheduleMessageDBHelper scheduleMessageDBHelper = new ScheduleMessageDBHelper(MessageActivity.this);
@@ -346,7 +344,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             //문자전송 권한에 대한 콜백을 받음
-            case AppUtility.BasicInfo.REQUEST_SEND_SMS :
+            case AppUtility.BasicInfo.REQUEST_SEND_SMS:
                 //권한을 승인한경우
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     sendMessage();
@@ -381,10 +379,10 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     protected void onResume() {
         super.onResume();
         //리시버 등록
-        if (receiver == null){
+        if (receiver == null) {
             IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
             intentFilter.addAction(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
-            receiver = new SMSReceiver(this);
+            receiver = SMSReceiver.getSmsReceiver(this);
             registerReceiver(receiver, intentFilter);
         }
     }
@@ -396,8 +394,11 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     }
 
     @Override
-    public void receiveNewMessage() {
+    public void updateNewMessage(boolean isreceivemessage, String phnumber) {
         DLog.d("call_receive_new!!!");
+        if (isreceivemessage && phnumber.equals(uNum))
+            messageDBHelper.changeMessageReadStatus(uNum);
         adapter.updateAllMessage(messageDBHelper.getAllMessageList(uNum));
+        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
     }
 }

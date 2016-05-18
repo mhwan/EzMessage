@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:clickable="true"
-    android:layout_height="match_parent">
+    android:orientation="vertical">
 
-    <ImageView
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleType="fitCenter"
-        android:id="@+id/icon"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal">
+
+        <RelativeLayout
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:scaleType="fitCenter"
+            android:layout_marginTop="1dp"
+            android:layout_marginRight="1dp"/>
+
+        <View
+            android:id="@+id/new_sign"
+            android:visibility="gone"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:background="@drawable/shape_new_message"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@id/icon" />
+        </RelativeLayout>
+
+    </FrameLayout>
+
 </LinearLayout>

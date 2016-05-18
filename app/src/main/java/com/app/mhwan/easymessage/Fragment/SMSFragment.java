@@ -35,7 +35,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SMSFragment extends Fragment implements MainActivity.BackKeyPressedListner, MainActivity.ActivityResultListner, NewMessageListener {
+public class SMSFragment extends Fragment implements MainActivity.BackKeyPressedListner, MainActivity.ActivityResultListner, NewMessageListener, MainActivity.NewSignListener {
     private static final String ARG_PARAM1 = "param1";
     private int position;
     private ListView menulist;
@@ -77,10 +77,7 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
         messageDBHelper = new MessageDBHelper(activity);
         activity.setOnBackKeyPressedListner(this);
         activity.setOnActivityResultListner(this);
-        receiver = new SMSReceiver(this);
-        IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-        intentFilter.addAction(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
-        activity.registerReceiver(receiver, intentFilter);
+        activity.setNewSignListener(this);
 
         initView();
 
@@ -113,6 +110,8 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
         mAdapter = new MessageListAdapter(activity, mListItems, messageDBHelper);
         ((MessageListAdapter) mAdapter).setMode(Attributes.Mode.Single);
         recyclerView.setAdapter(mAdapter);
+
+        activity.getSignview().setVisibility((mAdapter.getAllNewCount() > 0) ? View.VISIBLE : View.GONE);
         /*
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(activity, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
@@ -184,23 +183,19 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
     @Override
     public void onResume() {
         super.onResume();
-        if (receiver == null){
-            receiver = new SMSReceiver(this);
-            IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-            intentFilter.addAction(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
-            activity.registerReceiver(receiver, intentFilter);
-        }
-        DLog.d("on resume");
-        DLog.d("smsfragment set listner");
+        receiver = SMSReceiver.getSmsReceiver(this);
+        IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+        intentFilter.addAction(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
+        activity.registerReceiver(receiver, intentFilter);
         receiver.setListener(this);
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         try {
             activity.unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
     }
@@ -211,10 +206,20 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
     private void update() {
         DLog.d("fragment update!!");
         mAdapter.updateList(messageDBHelper.getAllLastMessageList());
+        View view = activity.getSignview();
+        if (view == null)
+            DLog.e("signview is null!!");
+        else
+            view.setVisibility((getNewSignCount() > 0) ? View.VISIBLE : View.GONE);
     }
 
     @Override
-    public void receiveNewMessage() {
+    public void updateNewMessage(boolean isreceivemessage, String phnumber) {
         update();
+    }
+
+    @Override
+    public int getNewSignCount() {
+        return mAdapter.getAllNewCount();
     }
 }

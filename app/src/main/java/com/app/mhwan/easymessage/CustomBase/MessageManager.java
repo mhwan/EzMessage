@@ -58,14 +58,18 @@ public class MessageManager {
     }
     private void addMessageToDB(String number){
         SimpleDateFormat dateFormat = new SimpleDateFormat(AppUtility.BasicInfo.DB_DATETIME_FORMAT);
+        number = number.replace("-", "");
         MessageItem item = new MessageItem();
-        item.setPh_number(number.replace("-", ""));
+        item.setPh_number(number);
         item.setContent(messageContent);
         item.setTime(dateFormat.format(new Date(System.currentTimeMillis())));
         item.setType(0);
         item.setIs_last_message(true);
         item.setIs_read(true);
         item.setRequest_code(-1);
+        int code = dbHelper.getSavedColorId(number);
+        //-1이라면 db에 저장이 안되있으므로 새로 저장할 코드 생성
+        item.setColor_id((code < 0)? AppUtility.getAppinstance().getColorIdtoDB(number) : code);
 
         dbHelper.addMessage(item);
     }

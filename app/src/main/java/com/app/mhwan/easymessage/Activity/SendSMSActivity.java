@@ -440,7 +440,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
                         item.setNumberlist(TextUtils.join(MessageManager.NUM_SEPERATOR, numberList));
                         item.setContent(msContent);
                         item.setIssend(false);
-                        item.setTimemillis(scheduled_date.getTimeInMillis());
+                        item.setTimemillis(scheduled_date.getTimeInMillis()-20000);
                         int request = dbHelper.addSchedule(item);
                         addScheduleToDB(numberList, msContent, scheduled_date.getTime(), request);
                         Intent intent = new Intent(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
@@ -475,15 +475,18 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
         MessageDBHelper messageDBHelper = new MessageDBHelper(this);
         for (String number : numberlist){
             long[] ids = AppUtility.getAppinstance().getPhotoPersonId(number.replace("-", ""));
+            number = number.replace("-", "");
             MessageItem item = new MessageItem();
-            item.setPh_number(number.replace("-", ""));
+            item.setPh_number(number);
             item.setContent(content);
             item.setTime(dateFormat.format(date));
             item.setType(0);
             item.setIs_last_message(true);
             item.setIs_read(true);
             item.setRequest_code(request);
-
+            int code = messageDBHelper.getSavedColorId(number);
+            //-1이라면 db에 저장이 안되있으므로 새로 저장할 코드 생성
+            item.setColor_id((code < 0)? AppUtility.getAppinstance().getColorIdtoDB(number) : code);
             messageDBHelper.addMessage(item);
         }
     }

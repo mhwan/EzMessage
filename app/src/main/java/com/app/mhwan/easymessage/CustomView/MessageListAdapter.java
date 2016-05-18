@@ -112,6 +112,7 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
         });
         MessageListItem item = mListItems.get(position);
         String name = item.getName();
+        DLog.d(name+" : "+item.getCount_no_read());
         viewHolder.mName.setText((name != null)? name : AppUtility.getAppinstance().changeNumberFormat(item.getPh_number()));
         viewHolder.mContent.setText(item.getLast_mContent());
         if (AppUtility.getAppinstance().isToday(item.getLast_mTime(), AppUtility.BasicInfo.DB_DATETIME_FORMAT))
@@ -137,7 +138,9 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
         else {
             viewHolder.circle.setVisibility(View.VISIBLE);
             viewHolder.user_imageview.setVisibility(View.INVISIBLE);
-            viewHolder.circle.setCircleBackgroundColor(light_color_array[AppUtility.getAppinstance().getColorId(item.getPh_number())]);
+            int color = item.getColor_id();
+            DLog.d(item.getPh_number()+" : "+item.getColor_id());
+            viewHolder.circle.setCircleBackgroundColor(light_color_array[(color >= 0 && !AppUtility.getAppinstance().getSaved(item.getPh_number()))? color : AppUtility.getAppinstance().getColorId(item.getPh_number())]);
         }
         //리사이클러뷰에 리스너를 달경우 스와이프상태일때 포커스를 가져가버림
         viewHolder.parent.setOnClickListener(new View.OnClickListener() {
@@ -260,6 +263,14 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
         private void cancelTask(){
             this.cancel(true);
         }
+    }
+
+    public int getAllNewCount(){
+        int count = 0;
+        for (MessageListItem item : mListItems)
+            count += item.getCount_no_read();
+
+        return count;
     }
     private interface RemoveCallback{
        void finishedRemove(boolean issuccess);
