@@ -11,7 +11,7 @@
      <string name="empty_multi_num">Input your repetition number.</string> 
     <string name="empty_number">Input cell phone number.</string> 
     <string name="fail_message_send">Your message was sent failed.</string>
-     <string name="general_message">Send Default Message</string> 
+     <string name="general_message">Send Normal Message</string> 
     <string name="if_close_send_activity">Your all of input will disappear. Are you sure you want to leave this page?</string>
     <string name="if_time_set_past">You can\'t send message due to your set time is earlier than now.</string>
     <string name="invalid_phone_number">Cell phone number is invaild number.</string>
@@ -24,7 +24,7 @@
      <string name="okay">Okay</string> 
     <string name="okay_call_permission">Permission is allowed. To make a call, please click call button.</string>
      <string name="okay_sms_send_permission">Permission is allowed. To send a message, please click send button.</string> 
-    <string name="over_byte_message">Your message is over 80byte.</string> 
+    <string name="over_byte_message">Your message is over %1$dbyte.</string> 
     <string name="quit_app">Please click BACK button again to exit.</string>
      <string name="repetition_number">Repetition</string> 
     <string name="scheduled_message">Send Schedule Message</string>
@@ -58,8 +58,34 @@
     <string name="message_copy_clipboard">Message has been copied to the clipboard.</string>
     <string name="phone_state_permission_request">Phone state permission is required to launch this app.</string>
     <string name="me">Me</string>
+    <string name="message_all_delete">All messages have been deleted.</string>
     <string name="delete_schedulemessage_title">Delete schedule message?</string>
     <string name="delete_schedulemessage_content">This schedule message will be cancel.</string>
     <string name="yes">Yes</string>
     <string name="schedule_message_cancel_successfully">Succeed to cancel schedule message.</string>
+    <string name="setting">Settings</string>
+    <string name="setting_notification">Notification</string>
+    <string name="setting_message">Message</string>
+    <string name="setting_max_byte">Max SMS message length</string>
+    <string name="setting_notification_summary_on">You receive notification.</string>
+    <string name="setting_notification_summary_off">You don\'t receive notification.</string>
+    <string name="setting_vibrate">Vibrate</string>
+    <string name="setting_sound">Sound</string>
+    <string name="setting_silent">Mute</string>
+    <string name="setting_notifi_type">Notification mode</string>
+    <string name="setting_notifi_popup">Display Pop-up</string>
+    <string name="setting_notifi_popup_summary">It display Pop-up.</string>
+    <string name="setting_notifi_popup_summary_off">It doesn\'t display Pop-up.</string>
+    <string name="setting_developer">Developer</string>
+    <string name="setting_send_mailto_developer">Send mail to developer</string>
+    <string name="setting_max_byte_summary">Message can send %1$sbyte maximum.</string>
+    <string name="hint_input_length">Input maximum length (byte).</string>
+    <string name="search_hint">search message..</string>
+    <string name="setting_delete_all_message_summary">Delete all the messages.</string>
+    <string name="setting_delete_all_title">Delete all</string>
+    <string name="change_notification_mode">To receive notification, please change sound mode of your cell phone.</string>
+    <string name="delete_all_message">Delete your all message?</string>
+    <string name="to_default_value">To default</string>
+    <string name="duplicate_number">The number is already added so that deleted.</string>
+    <string name="invalid_byte_value">It is invalid byte value.</string>
 </resources>

@@ -29,6 +29,8 @@ public class MessageManager {
         smsManager = SmsManager.getDefault();
     }
     public boolean sendMessage(boolean addtodb){
+        if (!AppUtility.getAppinstance().isSimSupport())
+            return false;
         if (addtodb)
             dbHelper = new MessageDBHelper(context);
         try {

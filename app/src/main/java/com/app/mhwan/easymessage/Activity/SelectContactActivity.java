@@ -19,8 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
-import com.app.mhwan.easymessage.CustomView.ContactItem;
 import com.app.mhwan.easymessage.CustomBase.DLog;
+import com.app.mhwan.easymessage.CustomView.ContactItem;
 import com.app.mhwan.easymessage.CustomView.SelectContactsAdapter;
 import com.app.mhwan.easymessage.R;
 
@@ -52,26 +52,6 @@ public class SelectContactActivity extends AppCompatActivity {
         setToolbarTitle();
         final ListView listView = (ListView)findViewById(R.id.select_listview);
         final SelectContactsAdapter adapter = new SelectContactsAdapter(contactItems, getApplicationContext());
-        listView.setAdapter(adapter);
-        listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position != 0) {
-                    boolean checked = adapter.getItem(position-1).getChecked();
-                    if (checked)
-                        num--;
-                    else
-                        num++;
-                    DLog.d(position + " click!");
-                    DLog.i("number : "+num);
-                    setToolbarTitle();
-                    adapter.getItem(position - 1).setChecked(!checked);
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        });
-
         final LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View mView = inflater.inflate(R.layout.header_contact_list, null, true);
         listView.addHeaderView(mView);
@@ -94,6 +74,27 @@ public class SelectContactActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        listView.setAdapter(adapter);
+        listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position != 0) {
+                    boolean checked = adapter.getItem(position-1).getChecked();
+                    if (checked)
+                        num--;
+                    else
+                        num++;
+                    DLog.d(position + " click!");
+                    DLog.i("number : "+num);
+                    setToolbarTitle();
+                    adapter.getItem(position - 1).setChecked(!checked);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+
         toolbar.findViewById(R.id.toolbar_okay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,5 +141,4 @@ public class SelectContactActivity extends AppCompatActivity {
         setResult(RESULT_CANCELED);
         finish();
     }
-
 }

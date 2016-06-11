@@ -30,7 +30,7 @@
     <string name="invalid_phone_number">유효하지 않은 전화번호 입니다.</string>
     <string name="if_close_send_activity">입력한 모든 내용은 사라집니다. 정말로 닫으시겠습니까?</string>
     <string name="if_time_set_past">예약 시간이 현재 시간보다 과거로 설정되어 전송할 수 없습니다.</string>
-    <string name="over_byte_message">입력하신 문자가 80바이트가 넘었습니다.</string>
+    <string name="over_byte_message">입력하신 문자가 %1$d바이트가 넘었습니다.</string>
     <string name="sending_message">메시지 전송 중... (%1$d/%2$d)</string>
     <string name="okay">확인</string>
     <string name="cancel">취소</string>
@@ -54,6 +54,7 @@
     <string name="message_option_share">공유</string>
     <string name="message_delete_failed">메시지 삭제에 실패하였습니다.</string>
     <string name="message_delete_successfully">메시지가 삭제되었습니다.</string>
+    <string name="message_all_delete">메시지가 모두 삭제되었습니다.</string>
     <string name="yes_Delete">넵, 지워버려요</string>
     <string name="message_copy_clipboard">메시지가 클립보드에 복사되었습니다.</string>
     <string name="phone_state_permission_request">이 앱을 실행시키려면 휴대폰 상태 읽기 권한이 필요합니다.</string>
@@ -62,4 +63,29 @@
     <string name="delete_schedulemessage_content">이 예약 메시지는 취소됩니다.</string>
     <string name="yes">확인</string>
     <string name="schedule_message_cancel_successfully">예약 메시지가 취소되었습니다.</string>
+    <string name="setting">설정</string>
+    <string name="search_hint">검색..</string>
+    <string name="setting_notification">알림 설정</string>
+    <string name="setting_message">메시지 설정</string>
+    <string name="setting_max_byte">최대 SMS 길이</string>
+    <string name="setting_notifi_popup">팝업 알림</string>
+    <string name="setting_notifi_popup_summary">팝업 알림을 표시합니다.</string>
+    <string name="setting_notifi_popup_summary_off">팝업 알림을 표시하지 않습니다.</string>
+    <string name="setting_notifi_type">알림 방법</string>
+    <string name="setting_notification_summary_off">알림을 받지 않습니다.</string>
+    <string name="setting_notification_summary_on">알림을 받습니다.</string>
+    <string name="setting_send_mailto_developer">개발자에게</string>
+    <string name="setting_silent">무음</string>
+    <string name="setting_sound">소리</string>
+    <string name="setting_vibrate">진동</string>
+    <string name="setting_developer">개발자 정보</string>
+    <string name="setting_max_byte_summary">최대 %1$sbyte 발신 가능합니다.</string>
+    <string name="hint_input_length">최대 길이(byte)를 입력해주세요.</string>
+    <string name="setting_delete_all_title">메시지함 초기화</string>
+    <string name="setting_delete_all_message_summary">메시지함에 있는 모든 메시지를 삭제합니다.</string>
+    <string name="change_notification_mode">알림을 받으시려면 휴대폰의 알림모드를 변경해주세요.</string>
+    <string name="delete_all_message">모든 메시지를 삭제하시겠습니까?</string>
+    <string name="to_default_value">기본값으로</string>
+    <string name="duplicate_number">이미 추가된 번호이므로 삭제되었습니다.</string>
+    <string name="invalid_byte_value">유효하지 않은 길이(byte) 입니다.</string>
 </resources>

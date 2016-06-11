@@ -76,7 +76,14 @@ public class ContactsFragment extends Fragment implements MainActivity.BackKeyPr
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ((SwipeLayout) (listView.getChildAt(position - listView.getFirstVisiblePosition()))).open(true);
+                openSwipeLayout(position);
+            }
+        });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                openSwipeLayout(position);
+                return false;
             }
         });
         listView.setTextFilterEnabled(true);
@@ -110,10 +117,12 @@ public class ContactsFragment extends Fragment implements MainActivity.BackKeyPr
             }
         });
 
-        AppUtility.getAppinstance().getRunningActivity();
     }
 
 
+    private void openSwipeLayout(int position){
+        ((SwipeLayout) (listView.getChildAt(position - listView.getFirstVisiblePosition()))).open(true);
+    }
     /**
      * searchview id
      *

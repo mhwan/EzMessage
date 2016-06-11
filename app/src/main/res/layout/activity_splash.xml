@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:id="@+id/root_splash"
-    android:background="@color/colorLightprimary"
     tools:context="com.app.mhwan.easymessage.Activity.Splash">
 
     <ImageView
@@ -12,11 +12,5 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:id="@+id/bg_splash"
-        android:src="@drawable/bg_splash" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@mipmap/bg_splash_title" />
-</FrameLayout>
+        android:src="@drawable/splash" />
+</LinearLayout>

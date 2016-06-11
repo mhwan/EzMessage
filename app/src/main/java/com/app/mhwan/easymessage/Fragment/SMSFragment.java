@@ -1,7 +1,6 @@
 package com.app.mhwan.easymessage.Fragment;
 
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -35,7 +34,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SMSFragment extends Fragment implements MainActivity.BackKeyPressedListner, MainActivity.ActivityResultListner, NewMessageListener, MainActivity.NewSignListener {
+public class SMSFragment extends Fragment implements MainActivity.BackKeyPressedListner, MainActivity.ActivityResultListner, NewMessageListener {
     private static final String ARG_PARAM1 = "param1";
     private int position;
     private ListView menulist;
@@ -77,7 +76,6 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
         messageDBHelper = new MessageDBHelper(activity);
         activity.setOnBackKeyPressedListner(this);
         activity.setOnActivityResultListner(this);
-        activity.setNewSignListener(this);
 
         initView();
 
@@ -85,8 +83,6 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
     }
 
     private void initView() {
-        DLog.d("init1!@@!");
-        //init bottomsheets, fab
         bottomSheetLayout = (BottomSheetLayout) view.findViewById(R.id.bottom_sheet);
         menulist = (ListView) view.findViewById(R.id.list_menu);
         floatingActionButton = activity.getFloatingActionButton();
@@ -110,8 +106,7 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
         mAdapter = new MessageListAdapter(activity, mListItems, messageDBHelper);
         ((MessageListAdapter) mAdapter).setMode(Attributes.Mode.Single);
         recyclerView.setAdapter(mAdapter);
-
-        activity.getSignview().setVisibility((mAdapter.getAllNewCount() > 0) ? View.VISIBLE : View.GONE);
+        setSignviewVisible();
         /*
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(activity, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
@@ -156,6 +151,11 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
         };
     }
 
+    private void setSignviewVisible(){
+        View view = activity.getSignview();
+        if (view != null)
+            view.setVisibility((mAdapter.getAllNewCount() > 0) ? View.VISIBLE : View.GONE);
+    }
     @Override
     public void onBackPressed() {
         //fab가 확장되었을경우 다시 들어가도록 처리할것
@@ -169,15 +169,7 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
 
     @Override
     public void onActivityResults(int requestcode, int resultcode, Intent data) {
-        if (requestcode == AppUtility.BasicInfo.MESSAGE_REQUEST || requestcode == AppUtility.BasicInfo.SEND_REQUEST) {
-            if (resultcode == AppUtility.BasicInfo.RESULT_NEW_MESSAGE || resultcode == Activity.RESULT_OK || resultcode == AppUtility.BasicInfo.SEND_RESERVED_SUCCESS) {
-                DLog.d("new_messsage!@#!@");
-                update();
-            } else if (resultcode == AppUtility.BasicInfo.RESULT_NOT_NEW) {
-                DLog.d("not new_messsage!@#!@");
-                update();
-            }
-        }
+           update();
     }
 
     @Override
@@ -206,11 +198,7 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
     private void update() {
         DLog.d("fragment update!!");
         mAdapter.updateList(messageDBHelper.getAllLastMessageList());
-        View view = activity.getSignview();
-        if (view == null)
-            DLog.e("signview is null!!");
-        else
-            view.setVisibility((getNewSignCount() > 0) ? View.VISIBLE : View.GONE);
+        setSignviewVisible();
     }
 
     @Override
@@ -218,8 +206,4 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
         update();
     }
 
-    @Override
-    public int getNewSignCount() {
-        return mAdapter.getAllNewCount();
-    }
 }

@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
@@ -23,8 +24,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Mhwan on 2016. 4. 5..
@@ -99,60 +102,37 @@ public class AppUtility {
         return rBitmap;
     }
 
-    public void getRunningActivity() {
-        ActivityManager manager = (ActivityManager) AppContext.getContext().getSystemService(Context.ACTIVITY_SERVICE);
-
-        /*
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH){
-                UsageStatsManager usageStatsManager = (UsageStatsManager) AppContext.getContext().getSystemService(Context.USAGE_STATS_SERVICE);
-
-            if (usageStatsManager != null)
-            {
-                UsageEvents queryEvents = usageStatsManager.queryEvents(System.currentTimeMillis() - 10000, System.currentTimeMillis());
-                String packageName = "";
-                String className = "";
-                if (queryEvents != null)
-                {
-                    UsageEvents.Event event = new UsageEvents.Event();
-
-                    while (queryEvents.hasNextEvent())
-                    {
-                        UsageEvents.Event eventAux = new UsageEvents.Event();
-                        queryEvents.getNextEvent(eventAux);
-
-                        if (eventAux.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND)
-                        {
-                            event = eventAux;
-                        }
-                    }
-
-                    packageName = event.getPackageName();
-                    className = event.getClassName();
-                }
-                DLog.d("package : "+packageName);
-                DLog.d("class : "+className);
-            }
-        }*/
-
-
-        List<ActivityManager.RunningTaskInfo> taskInfo = manager.getRunningTasks(1);
-
-        DLog.d("Running package : " + taskInfo.get(0).topActivity.getPackageName());
-        DLog.d("Running class : " + taskInfo.get(0).topActivity.getClassName());
-
-    }
-
     public int pxToDp(int px) {
         DisplayMetrics displayMetrics = AppContext.getContext().getResources().getDisplayMetrics();
         int dp = Math.round(px / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
         return dp;
     }
 
+    public int getTextByte(String s){
+        int en = 0, kr = 0, etc = 0;
+        char[] string = s.toCharArray();
+
+        for (int i = 0; i < s.length(); i++) {
+            if (string[i] >= 'A' && string[i] <= 'z')
+                en++;
+            else if (string[i] >= '\uAC00' && string[i] <= '\uD7A3')
+                kr += 2;
+            else
+                etc++;
+        }
+        return en + kr + etc;
+    }
+
     public String changeNumberFormat(String number){
         number = number.replaceAll("-", "");
-        if (number.length() == 10) {
-            if (number.startsWith("02"))
-                number = number.substring(0, 2) + "-" + number.substring(2, 6) + "-" + number.substring(6);
+        //집 전화번호
+        if (number.length() == 10 || number.startsWith("02")) {
+            //서울
+            if (number.startsWith("02")) {
+                int length = number.length();
+                number = number.substring(0, 2)+ "-" + number.substring(2, length-4)+ "-"+number.substring(length-4, length);
+            }
+            //나머지
             else
                 number = number.substring(0, 3) + "-" + number.substring(3, 6) + "-" + number.substring(6);
         } else if (number.length() > 8) {
@@ -163,6 +143,7 @@ public class AppUtility {
 
         return number;
     }
+
     public ArrayList<ContactItem> getContactList() {
         if (contactItems != null) {
             return contactItems;
@@ -184,7 +165,7 @@ public class AppUtility {
             Cursor cursor = AppContext.getContext().getContentResolver().query(uri, projection, null,
                     selectionArgs, sortOrder);
 
-            contactItems = new ArrayList<ContactItem>();
+            LinkedHashSet<ContactItem> hashlist = new LinkedHashSet<>();
             if (cursor.moveToFirst()) {
                 do {
                     long photo_id = cursor.getLong(2);
@@ -201,11 +182,12 @@ public class AppUtility {
                     contactItem.setPhoto_id(photo_id);
                     contactItem.setPerson_id(person_id);
 
-                    DLog.i("photo : "+photo_id+", person : "+person_id);
-                    contactItems.add(contactItem);
+                    boolean result = hashlist.add(contactItem);
+                    DLog.d(contactItem.getUser_Name()+" : "+result);
                 } while (cursor.moveToNext());
             }
 
+            contactItems = new ArrayList<>(hashlist);
             return contactItems;
         }
     }
@@ -215,6 +197,11 @@ public class AppUtility {
         String number = tm.getLine1Number();
 
         return number.replace("-", "");
+    }
+
+    public boolean isSimSupport(){
+        TelephonyManager tm = (TelephonyManager) AppContext.getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        return !(tm.getSimState() == TelephonyManager.SIM_STATE_ABSENT);
     }
 
     public int dpToPx(int dp) {
@@ -334,7 +321,7 @@ public class AppUtility {
     /**
      * color id 반환
      *
-     * 자기자신이라면 27, 상대방의 저장된 컬러 아이디 반환 (저장이 안되있다면 랜덤값을 생성하여 반환한다.
+     * 자기자신이라면 27, 상대방의 저장된 컬러 아이디 반환 (저장이 안되있다면
      */
     public int getColorId(String ph_num){
         if (ph_num.equals(getMyPhoneNumber()))
@@ -350,8 +337,42 @@ public class AppUtility {
             }
         }
         if (!issaved)
-            id = random.nextInt(AppContext.getContext().getResources().getIntArray(R.array.user_color).length);
+            id = 14;
         return id;
+    }
+
+    public boolean isAppRunning() {
+        boolean a = false;
+        try {
+            a =  new AppRunningCheck().execute().get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        } finally {
+            return a;
+        }
+    }
+
+    private class AppRunningCheck extends AsyncTask<Void, Void, Boolean>{
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            final Context context = AppContext.getContext();
+            return isAppOnForeground(context);
+        }
+
+        private boolean isAppOnForeground(Context context) {
+            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+            if (appProcesses == null) {
+                return false;
+            }
+            final String packageName = context.getPackageName();
+            for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+                if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND && appProcess.processName.equals("com.app.mhwan.easymessage")) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public class BasicInfo {
@@ -384,6 +405,7 @@ public class AppUtility {
         public static final String SEND_SCHEDULE_MESSAGE = "SEND_SCHEDULE_CONTENT";
         public static final String KEY_PREF_REQUEST = "KEY_REQUEST_CODE";
         public static final String KEY_INTENT_SCHEDULE = "key_intent_scheduelded";
+        public static final String KEY_NOTIFICATION_ID = "key_notification_id";
 
         //time format
         public static final String SEND_SMS_DATETIME_FORMAT = "a HH:mm / yyyy.MM.dd";
@@ -398,5 +420,6 @@ public class AppUtility {
         public static final int RESULT_NEW_MESSAGE = 0x119;
         public static final int RESULT_NOT_NEW = 0x211;
         public static final int MESSAGE_REQUEST = 0x214;
+        public static final int SETTING_REQUEST = 0x218;
     }
 }

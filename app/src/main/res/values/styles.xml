@@ -50,6 +50,19 @@
         <item name="colorControlActivated">@color/colorPrimary</item>
         <!-- colorControlActivated 포커스 되었을때 -->
     </style>
+
+    <!-- splash용 테마 -->
+    <style name="Theme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+    <style name="MyCheckBox" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/colorDarkPrimary</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+    </style>
     <!--
     <style name="MySearchview" parent="Base.Widget.AppCompat.SearchView">
         <item name="android:colorControlNormal">@color/colorPrimary</item>

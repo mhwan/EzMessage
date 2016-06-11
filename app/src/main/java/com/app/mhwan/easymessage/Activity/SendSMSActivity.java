@@ -11,7 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -33,10 +33,11 @@ import android.widget.Toast;
 import com.app.mhwan.easymessage.CustomBase.AppContext;
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.CustomBase.DLog;
+import com.app.mhwan.easymessage.CustomBase.InterverToast;
 import com.app.mhwan.easymessage.CustomBase.MessageDBHelper;
-import com.app.mhwan.easymessage.CustomBase.ScheduleMessageDBHelper;
 import com.app.mhwan.easymessage.CustomBase.MessageManager;
 import com.app.mhwan.easymessage.CustomBase.RequestPermission;
+import com.app.mhwan.easymessage.CustomBase.ScheduleMessageDBHelper;
 import com.app.mhwan.easymessage.CustomBase.ScheduleMessageItem;
 import com.app.mhwan.easymessage.CustomView.ContactItem;
 import com.app.mhwan.easymessage.CustomView.ContactsChipsView;
@@ -66,11 +67,11 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
     private ArrayList<ContactItem> contactsList;
     private TextView schedule;
     private int sendType; //0은 일반 1은 예약 2는 반복
-    private Toast overByteToast = null;
     private Calendar scheduled_date;
-    private boolean issetSchedule_time = false;
+    private volatile boolean issetSchedule_time = false;
     private ScheduleMessageDBHelper dbHelper;
     private String forwardcontent = null;
+    private int MAX_BYTE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,8 +84,8 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
             temp_Id = bundle.getInt(AppUtility.BasicInfo.SEND_PHONE_NUMBER);
             forwardcontent = bundle.getString(AppUtility.BasicInfo.SEND_CONTENT, null);
         }
-        else
-            DLog.e("bundle : null");
+        MAX_BYTE = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getString(SettingActivity.KEY_MESSAGE_LENGTH, "80"));
+        DLog.d(PreferenceManager.getDefaultSharedPreferences(this).getString(SettingActivity.KEY_NOTIFICATION_TYPE, ""));
         dbHelper = new ScheduleMessageDBHelper(this);
         initToolbar();
         initChipsView(temp_Id);
@@ -149,9 +150,9 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
                 break;
         }
         setupUI(findViewById(R.id.root_layout));
+        setByteTextview(0);
         messageContent.addTextChangedListener(new TextWatcher() {
-            boolean isfirst = true;
-
+            InterverToast interverToast = new InterverToast(getApplicationContext(), String.format(getString(R.string.over_byte_message), MAX_BYTE), Toast.LENGTH_SHORT);
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -159,48 +160,26 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (getTextbyte(messageContent.getText().toString()) <= 80) {
-                    if (overByteToast != null) {
-                        DLog.d("toast : null");
-                        isfirst = false;
-                        overByteToast.cancel();
-                    } else
-                        overByteToast = null;
+                if (AppUtility.getAppinstance().getTextByte(messageContent.getText().toString()) <= MAX_BYTE){
+                    if (interverToast != null)
+                        interverToast.killAllToast();
                 }
-                else
-                    isfirst = true;
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                int text_byte = getTextbyte(messageContent.getText().toString());
+                int text_byte = AppUtility.getAppinstance().getTextByte(messageContent.getText().toString());
                 //80바이트를 넘을경우 진동과 함께 토스트를 띄움
-                if (text_byte > 80 && isfirst) {
-                    Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-                    vibrator.vibrate(1000);
-                    overByteToast = Toast.makeText(getApplicationContext(), getResources().getString(R.string.over_byte_message), Toast.LENGTH_SHORT);
-                    overByteToast.show();
-                }
-                ((TextView) findViewById(R.id.textbyte)).setText(String.format("%02d/80 byte", text_byte));
+                if (text_byte > MAX_BYTE)
+                    interverToast.show();
+                setByteTextview(text_byte);
             }
         });
     }
 
-    private int getTextbyte(String s) {
-        int en = 0, kr = 0, etc = 0;
-        char[] string = s.toCharArray();
-
-        for (int i = 0; i < s.length(); i++) {
-            if (string[i] >= 'A' && string[i] <= 'z')
-                en++;
-            else if (string[i] >= '\uAC00' && string[i] <= '\uD7A3')
-                kr += 2;
-            else
-                etc++;
-        }
-        return en + kr + etc;
+    private void setByteTextview(int now){
+        ((TextView) findViewById(R.id.textbyte)).setText(String.format("%02d/%d byte", now, MAX_BYTE));
     }
-
     private void setupUI(final View view) {
         if (!(view instanceof EditText)) {
             view.setOnTouchListener(new View.OnTouchListener() {
@@ -333,7 +312,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
             messagebuilder = messagetype[type] + "에서는 " + sType + " 변경하실 수 없습니다.";
         }
         else {
-            String[] messagetype = {"Default Message", "Schedule Message", "Repeated Message"};
+            String[] messagetype = {"Normal Message", "Schedule Message", "Repeated Message"};
             messagebuilder = "You can\'t change "+sType+" in "+messagetype[type];
         }
         Snackbar.make(findViewById(R.id.root_layout), messagebuilder, Snackbar.LENGTH_SHORT).show();
@@ -347,7 +326,15 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
 
     @Override
     public void onTokenAdded(Object token) {
-
+        if (token instanceof ContactItem){
+            String n = ((ContactItem) token).getPhNumberChanged();
+            ArrayList<String> list = getAllNumberList();
+            DLog.d(list.size()+"");
+            if (list.subList(0, list.size()-1).contains(n) && list.size() != 1) {
+                chipsView.removeObject((ContactItem) token);
+                Toast.makeText(getApplicationContext(), getString(R.string.duplicate_number), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -584,6 +571,10 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
         }
         if (number_list.size()==0) {
             Toast.makeText(getApplicationContext(), getString(R.string.empty_number), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (AppUtility.getAppinstance().getTextByte(content) > MAX_BYTE){
+            Toast.makeText(getApplicationContext(), String.format(getString(R.string.over_byte_message), MAX_BYTE), Toast.LENGTH_SHORT).show();
             return false;
         }
 

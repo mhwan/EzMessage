@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +29,7 @@ import android.widget.Toast;
 
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.CustomBase.DLog;
+import com.app.mhwan.easymessage.CustomBase.InterverToast;
 import com.app.mhwan.easymessage.CustomBase.MessageDBHelper;
 import com.app.mhwan.easymessage.CustomBase.MessageManager;
 import com.app.mhwan.easymessage.CustomBase.NewMessageListener;
@@ -43,12 +47,15 @@ import java.util.ArrayList;
 public class MessageActivity extends AppCompatActivity implements NewMessageListener {
     private String uName, uNum;
     private EditText mInputtext;
-    private boolean issend = false;
+    private boolean ischange = false;
     private ArrayList<MessageItem> messageItems;
     private MessageAdapter adapter;
     private SMSReceiver receiver;
     private MessageDBHelper messageDBHelper;
     private RecyclerView recyclerView;
+    private SearchView searchView;
+    private MenuItem searchitem;
+    private int MAXBYTE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,41 +63,57 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
         setContentView(R.layout.activity_message);
         uName = getIntent().getStringExtra(AppUtility.BasicInfo.U_NAME);
         uNum = getIntent().getStringExtra(AppUtility.BasicInfo.U_NUMBER);
+        MAXBYTE = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getString(SettingActivity.KEY_MESSAGE_LENGTH, "80"));
         messageDBHelper = new MessageDBHelper(this);
         messageDBHelper.changeMessageReadStatus(uNum);
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.cancel(3);
+        int nId = getIntent().getExtras().getInt(AppUtility.BasicInfo.KEY_NOTIFICATION_ID);
+        NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        manager.cancel(nId);
         initToolbar(uName, uNum);
         initView();
     }
 
     private void initView() {
         mInputtext = (EditText) findViewById(R.id.message_input);
-        mInputtext.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                DLog.d("keboard changed");
-                recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
-            }
-        });
         findViewById(R.id.message_send_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mInputtext.getText().toString().isEmpty())
+                String input = mInputtext.getText().toString();
+                if (!input.isEmpty() && AppUtility.getAppinstance().getTextByte(input)<= MAXBYTE)
                     sendMessage();
                 else
                     Toast.makeText(getApplicationContext(), getString(R.string.empty_content), Toast.LENGTH_SHORT).show();
             }
         });
 
+        mInputtext.addTextChangedListener(new TextWatcher() {
+            InterverToast interverToast = new InterverToast(getApplicationContext(), String.format(getString(R.string.over_byte_message), MAXBYTE), Toast.LENGTH_SHORT);
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (AppUtility.getAppinstance().getTextByte(mInputtext.getText().toString()) <= MAXBYTE)
+                    interverToast.killAllToast();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                int text_byte = AppUtility.getAppinstance().getTextByte(mInputtext.getText().toString());
+                //80바이트를 넘을경우 진동과 함께 토스트를 띄움
+                if (text_byte > MAXBYTE) {
+                    interverToast.show();
+                }
+            }
+        });
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager manager = new LinearLayoutManager(this);
         //항상 스크롤은 마지막아이템에
         //manager.setStackFromEnd(true);
         recyclerView.setLayoutManager(manager);
-        DLog.i("number : " + uNum);
         messageItems = messageDBHelper.getAllMessageList(uNum);
-        DLog.i("size : " + messageItems.size());
         adapter = new MessageAdapter(this, messageItems);
         recyclerView.setAdapter(adapter);
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
@@ -110,13 +133,11 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                DLog.d("Scroll changed !!" + newState);
             }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                DLog.d("on scrolled" + dx + ", " + dy);
             }
         });
         //소프트 키보드 상태변화 리스너
@@ -142,7 +163,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
             MessageManager manager = new MessageManager(list, mInputtext.getText().toString());
             manager.setContext(MessageActivity.this);
             manager.sendMessage(true);
-            issend = true;
+            ischange = true;
             mInputtext.setText("");
             updateNewMessage(false, uNum);
         }
@@ -167,7 +188,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     }
 
     private void finishActivity() {
-        setResult((issend) ? AppUtility.BasicInfo.RESULT_NEW_MESSAGE : AppUtility.BasicInfo.RESULT_NOT_NEW);
+        setResult((ischange) ? AppUtility.BasicInfo.RESULT_NEW_MESSAGE : AppUtility.BasicInfo.RESULT_NOT_NEW);
         finish();
     }
 
@@ -219,7 +240,6 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                         dialog.dismiss();
                         final AlertDialog.Builder mBuilder = new AlertDialog.Builder(MessageActivity.this);
                         mBuilder.setTitle(getString(R.string.message_type));
-                        String[] strings = getResources().getStringArray(R.array.message_type_array);
                         mBuilder.setItems(getResources().getStringArray(R.array.message_type_array), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -229,7 +249,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                                 intent.putExtra(AppUtility.BasicInfo.SEND_CONTENT, messageItems.get(position).getContent());
                                 startActivityForResult(intent, AppUtility.BasicInfo.SEND_REQUEST);
                                 dialog.dismiss();
-                                issend = true;
+                                ischange = true;
                                 finishActivity();
                             }
                         });
@@ -308,8 +328,8 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_message, menu);
-        MenuItem searchitem = menu.findItem(R.id.menu_search);
-        final SearchView searchView = (SearchView) searchitem.getActionView();
+        searchitem = menu.findItem(R.id.menu_search);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchitem);
         SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
@@ -367,10 +387,6 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                 adapter.removeAllMessage();
                 Toast.makeText(MessageActivity.this, getString(R.string.message_delete_successfully), Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.menu_search:
-                DLog.i("click search");
-                item.expandActionView();
-                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -396,6 +412,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     @Override
     public void updateNewMessage(boolean isreceivemessage, String phnumber) {
         DLog.d("call_receive_new!!!");
+        ischange = true;
         if (isreceivemessage && phnumber.equals(uNum))
             messageDBHelper.changeMessageReadStatus(uNum);
         adapter.updateAllMessage(messageDBHelper.getAllMessageList(uNum));

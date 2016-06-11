@@ -52,4 +52,14 @@
         <item>@color/light_bgrey</item>
         <item>@color/light_brown</item>
     </array>
+    <string-array name="notification_type">
+        <item>@string/setting_vibrate</item>
+        <item>@string/setting_sound</item>
+        <item>@string/setting_silent</item>
+    </string-array>
+    <string-array name="notification_type_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

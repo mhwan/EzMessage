@@ -12,9 +12,8 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:background="@color/colorTabbar"
-        android:minHeight="?android:attr/actionBarSize"
         app:popupTheme="@style/AppTheme.Toolbar.Popuptheme"
         app:subtitleTextAppearance="@style/AppTheme.Toolbar.SubTitle"
         app:theme="@style/AppTheme.Toolbar"
@@ -55,17 +54,6 @@
                 android:text="@string/send"
                 android:textColor="@color/colorLightprimary"
                 android:textSize="15sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@id/message_send_button"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="2dp"
-                android:layout_above="@id/message_send_button"
-                android:layout_marginBottom="4dp"
-                android:text="12/80byte"
-                android:textSize="11sp"/>
 
             <EditText
                 android:id="@+id/message_input"

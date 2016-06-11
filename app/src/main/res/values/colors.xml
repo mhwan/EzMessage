@@ -39,5 +39,6 @@
     <color name="light_grey">#bdbdbd</color>
     <color name="light_bgrey">#90a4ae</color>
     <color name="light_brown">#bcaaa4</color>
+    <color name="dark_bgrey">#546e7a</color>
     <color name="background_default_touch_color">#0d000000</color>
 </resources>

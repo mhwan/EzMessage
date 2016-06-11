@@ -139,7 +139,7 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
             viewHolder.circle.setVisibility(View.VISIBLE);
             viewHolder.user_imageview.setVisibility(View.INVISIBLE);
             int color = item.getColor_id();
-            DLog.d(item.getPh_number()+" : "+item.getColor_id());
+            //db에 저장된 컬러값이 양수이고 저장되지 않았을경우 db에 저장된 컬러값으로,
             viewHolder.circle.setCircleBackgroundColor(light_color_array[(color >= 0 && !AppUtility.getAppinstance().getSaved(item.getPh_number()))? color : AppUtility.getAppinstance().getColorId(item.getPh_number())]);
         }
         //리사이클러뷰에 리스너를 달경우 스와이프상태일때 포커스를 가져가버림

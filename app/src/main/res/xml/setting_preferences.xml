@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.app.mhwan.easymessage.CustomView.CustomPreferenceCategory
+        android:title="@string/setting_message">
+        <Preference
+            android:title="@string/setting_max_byte"
+            android:key="key_message_byte">
+        </Preference>
+        <Preference
+            android:key="key_message_delete_all"
+            android:title="@string/setting_delete_all_title"
+            android:summary="@string/setting_delete_all_message_summary"></Preference>
+    </com.app.mhwan.easymessage.CustomView.CustomPreferenceCategory>
+
+    <com.app.mhwan.easymessage.CustomView.CustomPreferenceCategory
+        android:title="@string/setting_notification">
+        <com.app.mhwan.easymessage.CustomView.CustomSwitchPreference
+            android:key="key_notification_title"
+            android:title="@string/setting_notification"
+            android:summaryOn="@string/setting_notification_summary_on"
+            android:summaryOff="@string/setting_notification_summary_off"
+            android:defaultValue="true"></com.app.mhwan.easymessage.CustomView.CustomSwitchPreference>
+
+        <com.app.mhwan.easymessage.CustomView.CustomCheckBoxPreference
+            android:key="key_notification_check"
+            android:dependency="key_notification_title"
+            android:title="@string/setting_notifi_popup"
+            android:summaryOn="@string/setting_notifi_popup_summary"
+            android:summaryOff="@string/setting_notifi_popup_summary_off"
+            android:defaultValue="true"></com.app.mhwan.easymessage.CustomView.CustomCheckBoxPreference>
+        <ListPreference
+            android:title="@string/setting_notifi_type"
+            android:negativeButtonText="@string/cancel"
+            android:positiveButtonText="@string/okay"
+            android:dependency="key_notification_check"
+            android:key="key_notification_type"
+            android:entries="@array/notification_type"
+            android:entryValues="@array/notification_type_value"></ListPreference>
+    </com.app.mhwan.easymessage.CustomView.CustomPreferenceCategory>
+
+    <com.app.mhwan.easymessage.CustomView.CustomPreferenceCategory
+        android:title="@string/setting_developer">
+        <Preference
+            android:key="key_send_mail"
+            android:title="@string/setting_send_mailto_developer">
+        </Preference>
+    </com.app.mhwan.easymessage.CustomView.CustomPreferenceCategory>
+</PreferenceScreen>

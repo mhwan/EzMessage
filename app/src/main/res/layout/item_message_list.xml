@@ -63,7 +63,7 @@
                     android:id="@+id/ic_person"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    mhwan:icon_padding="11dp"
+                    mhwan:icon_padding="12.5dp"
                     mhwan:icon_src="@mipmap/ic_person"></com.app.mhwan.easymessage.CustomView.RandomProfileIcon>
 
                 <de.hdodenhof.circleimageview.CircleImageView

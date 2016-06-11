@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
+import com.app.mhwan.easymessage.CustomBase.DLog;
 import com.app.mhwan.easymessage.R;
 
 /**
@@ -73,6 +74,7 @@ public class RandomProfileIcon extends RelativeLayout{
         setBoarder_width(boarder_width);
         setBoarder_color(boarder_color);
         setCircleBackgroundColor(background_color);
+        DLog.d(padding_ic_px+"");
         setIconPadding(padding_ic_px);
         attr.recycle();
     }

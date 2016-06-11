@@ -91,6 +91,14 @@ public class MessageDBHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * 메시지 전체 삭제
+     */
+    public void removeAll(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "DELETE FROM "+Message_List_TABLE_NAME;
+        db.execSQL(query);
+    }
+    /**
      *
      * @return 마지막 메시지 리스트를 시간순 (내림차순)로 반환한다.
      */
@@ -136,6 +144,37 @@ public class MessageDBHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    public int getNoReadMessageNumber(){
+        ArrayList<MessageListItem> listItems = getAllLastMessageList();
+        int count = 0;
+        for (MessageListItem item : listItems){
+            int n = 0;
+            if ((n = item.getCount_no_read()) > 0)
+                count+=n;
+        }
+
+        return count;
+    }
+
+    /**
+     * 다른 사람한테 여러 메시지 왔다면 true, 아니면 false반환
+     * @return
+     */
+    public boolean isDifferentDestination(){
+        ArrayList<MessageListItem> listItems = getAllLastMessageList();
+        boolean status = false;
+        boolean flag = false;
+
+        for (MessageListItem item : listItems){
+            //처음에는 플래그가 트루가 될테고 그 이후부터 0개 이상이라는 거는 여러사람한테 new가 왔다는것
+            if (item.getCount_no_read() > 0 && flag == false)
+                flag = true;
+            else if (item.getCount_no_read() > 0 && flag == true)
+                status = true;
+        }
+
+        return status;
+    }
 
     /**
      *
@@ -167,6 +206,12 @@ public class MessageDBHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    /**
+     * 핸드폰 번호로 메시지 리스트에 저장된 컬러값을 반환한다.
+     * 저장되지 않았다면 음수반환
+     * @param number
+     * @return
+     */
     public int getSavedColorId(String number){
         ArrayList<MessageListItem> listItems = getAllLastMessageList();
         int id = -1;

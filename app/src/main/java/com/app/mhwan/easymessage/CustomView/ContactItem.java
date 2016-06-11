@@ -65,4 +65,17 @@ public class ContactItem implements Serializable{
         return user_Name;
     }
     public enum Contact_type { NAME_TYPE, NUMBER_TYPE}
+
+    @Override
+    public int hashCode() {
+        return getPhNumberChanged().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ContactItem)
+            return getPhNumberChanged().equals(((ContactItem) o).getPhNumberChanged());
+
+        return false;
+    }
 }

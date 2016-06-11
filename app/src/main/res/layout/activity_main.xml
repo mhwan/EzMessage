@@ -26,14 +26,6 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorTabbar"
                 android:minHeight="48dp">
-
-                <TextView
-                    android:id="@+id/toolbar_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="21sp" />
             </android.support.v7.widget.Toolbar>
 
             <android.support.design.widget.TabLayout
@@ -63,9 +55,20 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="18dp"
         android:background="#7e57c2"
-        android:backgroundTint="#7e57c2"
         android:src="@mipmap/ic_send"
         app:borderWidth="0dp"
         app:fabSize="normal"
         app:rippleColor="@color/colorPrimary" />
+
+<!--
+    <com.melnykov.fab.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="18dp"
+        app:fabSize="normal"
+        app:fab_colorNormal="#7e57c2"
+        app:fab_colorPressed="@color/colorPrimary"
+        app:fab_shadow="true"
+        android:src="@mipmap/ic_send" />-->
 </android.support.design.widget.CoordinatorLayout>
