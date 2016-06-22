@@ -2,57 +2,57 @@
 <resources>
     <string name="Schedule_time">Schedule</string> 
     <string name="app_name">eZ Message</string> 
-    <string name="call_permission_request">Call permission is required to make a call</string> 
+    <string name="call_permission_request">Calling permission is required to make a call.</string> 
     <string name="cancel">Cancel</string>
      <string name="cell_phone_number">Cell phone</string> 
-    <string name="contact_permission_request">Read Contacts permission is required to launch this app.</string>
+    <string name="contact_permission_request">Contact reading permission is required to launch this app.</string>
      <string name="contacts_name">My Contacts</string> 
     <string name="empty_content">Input your message.</string>
-     <string name="empty_multi_num">Input your repetition number.</string> 
+     <string name="empty_multi_num">Input your number of repetition.</string> 
     <string name="empty_number">Input cell phone number.</string> 
-    <string name="fail_message_send">Your message was sent failed.</string>
+    <string name="fail_message_send">Failed to send message.</string>
      <string name="general_message">Send Normal Message</string> 
-    <string name="if_close_send_activity">Your all of input will disappear. Are you sure you want to leave this page?</string>
-    <string name="if_time_set_past">You can\'t send message due to your set time is earlier than now.</string>
-    <string name="invalid_phone_number">Cell phone number is invaild number.</string>
+    <string name="if_close_send_activity">All of your input will disappear. Are you sure you want to leave this page?</string>
+    <string name="if_time_set_past">You can\'t send message because your set time is earlier than now.</string>
+    <string name="invalid_phone_number">Cell phone number is invaild.</string>
      <string name="message_content">Message contents</string> 
     <string name="message_name">My Message</string> 
     <string name="multi_message">Send Repeated Message</string>
-     <string name="no_call_permission">You can\'t call because permission denied.</string> 
-    <string name="new_number_invalid">New cell phone number must be a number.</string>
-    <string name="no_sms_send_permission">You can\'t send message because permission denied.</string>
+     <string name="no_call_permission">You can\'t call because permission was denied.</string> 
+    <string name="new_number_invalid">New cell phone number must be of numerical characters.</string>
+    <string name="no_sms_send_permission">You can\'t send message because permission was denied.</string>
      <string name="okay">Okay</string> 
-    <string name="okay_call_permission">Permission is allowed. To make a call, please click call button.</string>
-     <string name="okay_sms_send_permission">Permission is allowed. To send a message, please click send button.</string> 
+    <string name="okay_call_permission">Permission is granted. Please click call button to make a call.</string>
+     <string name="okay_sms_send_permission">Permission is granted. Please click send button to send a message.</string> 
     <string name="over_byte_message">Your message is over %1$dbyte.</string> 
     <string name="quit_app">Please click BACK button again to exit.</string>
      <string name="repetition_number">Repetition</string> 
-    <string name="scheduled_message">Send Schedule Message</string>
+    <string name="scheduled_message">Send Scheduled Message</string>
      <string name="search_name_or_number">Search name or number</string> 
     <string name="send">Send</string>
      <string name="send_message">Send Message</string> 
     <string name="sending_message">Sending a Message... (%1$d/%2$d)</string> 
-    <string name="sms_send_permission_request">Send SMS permission is required to send your message.</string>
-     <string name="success_message_reserved">Your message will send at set time.</string> 
+    <string name="sms_send_permission_request">SMS sending permission is required to send your message.</string>
+     <string name="success_message_reserved">Your message will be sent at set time.</string> 
     <string name="success_message_send">Your message was sent successfully. </string>
     <string name="date_picker_title">Select date</string>
     <string name="time_picker_title">Select time</string>
-    <string name="is_repitition">repetition</string>
-    <string name="is_schedule">schedule</string>
+    <string name="is_repitition">number of repetition</string>
+    <string name="is_schedule">time of schedule</string>
     <string name="message_type">Select type </string>
     <string name="allow">Allow</string>
     <string name="select_contact_title">Select Contacts</string>
     <string name="Delete_all_message">Delete all</string>
     <string name="call">Call</string>
-    <string name="send_schedule_succeessfully">Your schedule message was sent.</string>
+    <string name="send_schedule_succeessfully">Your scheduled message was sent.</string>
     <string name="delete_message_list">Delete this message?</string>
-    <string name="deleting_messages">Deleting messages...</string>
+    <string name="deleting_messages">Deleting message...</string>
     <string name="message_option">Option</string>
     <string name="message_option_delete">Delete Message</string>
     <string name="message_option_forward">Forward</string>
     <string name="message_option_copy">Copy</string>
     <string name="message_option_share">Share</string>
-    <string name="message_delete_successfully">Succeed to delete message.</string>
+    <string name="message_delete_successfully">Successfully deleted message.</string>
     <string name="message_delete_failed">Failed to delete message.</string>
     <string name="yes_Delete">YES, DELETE</string>
     <string name="message_copy_clipboard">Message has been copied to the clipboard.</string>
@@ -62,13 +62,13 @@
     <string name="delete_schedulemessage_title">Delete schedule message?</string>
     <string name="delete_schedulemessage_content">This schedule message will be cancel.</string>
     <string name="yes">Yes</string>
-    <string name="schedule_message_cancel_successfully">Succeed to cancel schedule message.</string>
+    <string name="schedule_message_cancel_successfully">Successfully canceled scheduled message.</string>
     <string name="setting">Settings</string>
     <string name="setting_notification">Notification</string>
     <string name="setting_message">Message</string>
     <string name="setting_max_byte">Max SMS message length</string>
-    <string name="setting_notification_summary_on">You receive notification.</string>
-    <string name="setting_notification_summary_off">You don\'t receive notification.</string>
+    <string name="setting_notification_summary_on">Receiving notification.</string>
+    <string name="setting_notification_summary_off">Not receiving notification.</string>
     <string name="setting_vibrate">Vibrate</string>
     <string name="setting_sound">Sound</string>
     <string name="setting_silent">Mute</string>
@@ -81,11 +81,38 @@
     <string name="setting_max_byte_summary">Message can send %1$sbyte maximum.</string>
     <string name="hint_input_length">Input maximum length (byte).</string>
     <string name="search_hint">search message..</string>
-    <string name="setting_delete_all_message_summary">Delete all the messages.</string>
+    <string name="setting_delete_all_message_summary">Deleting all the messages.</string>
     <string name="setting_delete_all_title">Delete all</string>
     <string name="change_notification_mode">To receive notification, please change sound mode of your cell phone.</string>
     <string name="delete_all_message">Delete your all message?</string>
     <string name="to_default_value">To default</string>
-    <string name="duplicate_number">The number is already added so that deleted.</string>
-    <string name="invalid_byte_value">It is invalid byte value.</string>
+    <string name="duplicate_number">The number is deleted because it has been added before..</string>
+    <string name="invalid_byte_value">It is an invalid byte value.</string>
+    <string name="warning_multi_send">Some message may not send because limitation of wireless service provider. Are you sure send repeated message?</string>
+    <string name="export_to_excel">Export to Excel</string>
+    <string name="all_days">All days</string>
+    <string name="all_messages">All messages</string>
+    <string name="export">Export</string>
+    <string name="export_message_type">Type :</string>
+    <string name="fail_export">Failed to export Excel file.</string>
+    <string name="filter">Filter</string>
+    <string name="incomming_message">Incoming messages only</string>
+    <string name="input_filename">Input your name of exported file.</string>
+    <string name="invalid_filename_export">It can\'t export to Excel file because name of file is incorrect.</string>
+    <string name="invalid_period_export">It can\'t export to Excel file because your select of date is incorrect.</string>
+    <string name="outgoing_message">Outgoing messages only</string>
+    <string name="period">Period of message :</string>
+    <string name="period_days">Days</string>
+    <string name="success_export">Successfully exported to Excel file.</string>
+    <string name="title_filename">File :</string>
+    <string name="uncorrect_period">Please select date correctly.</string>
+    <string name="title_note">Note</string>
+    <string name="title_time">Time</string>
+    <string name="title_type">Type</string>
+    <string name="outgoing">Outgoing</string>
+    <string name="incoming">Incoming</string>
+    <string name="scheduled">Scheduled</string>
+    <string name="request_write_storage">Write external storage permission is required to export file.</string>
+    <string name="okay_write_storage_permission">Permission is granted. Please click export button to export file.</string>
+    <string name="no_write_storage_permission">You can\'t export to Excel file because permission was denied.</string>
 </resources>

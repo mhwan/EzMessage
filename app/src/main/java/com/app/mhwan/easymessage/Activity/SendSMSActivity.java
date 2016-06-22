@@ -307,12 +307,12 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
 
     private void invalidMessageBuilder(int type, String sType) {
         String messagebuilder="";
-        if (AppUtility.getAppinstance().getCountryISO(LOCALE_TYPE.LANGUAGE).equals("한국어")) {
+        if (AppUtility.getAppinstance().getCountryISO(AppUtility.LOCALE_TYPE.LANGUAGE).equals("한국어")) {
             String[] messagetype = {"일반 메시지", "예약 메시지", "반복 메시지"};
             messagebuilder = messagetype[type] + "에서는 " + sType + " 변경하실 수 없습니다.";
         }
         else {
-            String[] messagetype = {"Normal Message", "Schedule Message", "Repeated Message"};
+            String[] messagetype = {"Normal Message", "Scheduled Message", "Repeated Message"};
             messagebuilder = "You can\'t change "+sType+" in "+messagetype[type];
         }
         Snackbar.make(findViewById(R.id.root_layout), messagebuilder, Snackbar.LENGTH_SHORT).show();
@@ -402,9 +402,9 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
     }
 
     private void sendMessage() {
-        ArrayList<String> numberList = getAllNumberList();
-        String msContent = messageContent.getText().toString();
-        String multi_num = multi_input.getText().toString();
+        final ArrayList<String> numberList = getAllNumberList();
+        final String msContent = messageContent.getText().toString();
+        final String multi_num = multi_input.getText().toString();
         if (isVaild(numberList, msContent, multi_num) && new RequestPermission(SendSMSActivity.this, 0).isPermission(findViewById(R.id.root_layout))) {
             switch (sendType) {
                 case 0:
@@ -437,10 +437,10 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
                         PendingIntent pendingIntent = PendingIntent.getBroadcast(SendSMSActivity.this, request, intent, 0);
                         AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, scheduled_date.getTimeInMillis(), pendingIntent);
+                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, scheduled_date.getTimeInMillis()-5000, pendingIntent);
                         }
                         else {
-                            alarmManager.set(AlarmManager.RTC_WAKEUP, scheduled_date.getTimeInMillis(), pendingIntent);
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, scheduled_date.getTimeInMillis()-5000, pendingIntent);
                         }
                         finishedSendSMS(SMS_RESULT.SEND_RESERVED);
                     }
@@ -448,9 +448,25 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.if_time_set_past), Toast.LENGTH_SHORT).show();
                     break;
                 case 2:
-                    MultiSMSSendTask task = new MultiSMSSendTask();
-                    task.setMultiMessage(Integer.parseInt(multi_num), numberList, msContent);
-                    task.execute();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(getResources().getString(R.string.warning_multi_send))
+                            .setPositiveButton(getResources().getString(R.string.okay), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                    MultiSMSSendTask task = new MultiSMSSendTask();
+                                    task.setMultiMessage(Integer.parseInt(multi_num), numberList, msContent);
+                                    task.execute();
+                                }
+                            })
+                            .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
 
                     break;
             }
@@ -580,8 +596,8 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
 
         for (String number : number_list){
             //핸드폰 번호도 일반 집전화번호도 아닐 경우 국가 대한민국.
-            if (AppUtility.getAppinstance().getCountryISO(LOCALE_TYPE.NETWORK).equals("KR")) {
-                if (!(Pattern.matches("^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$", number) || Pattern.matches("^\\d{2,3}-\\d{3,4}-\\d{4}$", number))) {
+            if (AppUtility.getAppinstance().getCountryISO(AppUtility.LOCALE_TYPE.NETWORK).equals("KR")) {
+                if ((!Pattern.matches("^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$", number) && (!Pattern.matches("^\\d{2,3}-\\d{3,4}-\\d{4}$", number)))) {
                     Toast.makeText(getApplicationContext(), getString(R.string.invalid_phone_number), Toast.LENGTH_SHORT).show();
                     return false;
                 }
@@ -625,5 +641,4 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
     }
 
     public enum SMS_RESULT{ SEND_SUCCESS, SEND_FAIL, SEND_RESERVED }
-    public enum LOCALE_TYPE { NETWORK, LANGUAGE }
 }

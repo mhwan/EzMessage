@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:apps="http://schemas.android.com/apk/res-auto">
+
+    <!-- 검색 익스팬딩 오류로 안되도록
     <item
         android:id="@+id/menu_search"
         apps:showAsAction="ifRoom|collapseActionView"
         android:icon="@mipmap/ic_search"
         android:title=""
         apps:actionViewClass="android.support.v7.widget.SearchView"/>
+
+        -->
 
     <item
         android:title=""
@@ -20,6 +24,9 @@
             <item
                 android:id="@+id/sub_delete_all"
                 android:title="@string/Delete_all_message" />
+            <item
+                android:id="@+id/sub_export_excel"
+                android:title="@string/export_to_excel" />
         </menu>
     </item>
 </menu>

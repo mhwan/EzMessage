@@ -39,6 +39,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ItemView
         return new ItemViewholder(item);
     }
 
+    public MessageItem getFirstMessageItem(){
+        return messageItems.get(0);
+    }
     @Override
     public void onBindViewHolder(ItemViewholder holder, int position) {
         MessageItem item = messageItems.get(position);
@@ -107,6 +110,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ItemView
         notifyDataSetChanged();
     }
 
+    public ArrayList<MessageItem> getMessageItems(){
+        return messageItems;
+    }
     public static final class ItemViewholder extends RecyclerView.ViewHolder {
         FrameLayout circle;
         RandomProfileIcon icon_circle;

@@ -29,6 +29,7 @@ public class RandomProfileIcon extends RelativeLayout{
     private int boarder_width;
     private int boarder_color;
     private boolean isDrawStroke = false;
+    private boolean isautopadding = false;
 
     public RandomProfileIcon(Context context) {
         super(context);
@@ -66,6 +67,7 @@ public class RandomProfileIcon extends RelativeLayout{
     private void setTypedArray(Context context, AttributeSet attrs){
         TypedArray attr = context.obtainStyledAttributes(attrs, R.styleable.RandomProfileIcon, 0, 0);
         icon_id = attr.getResourceId(R.styleable.RandomProfileIcon_icon_src, 0);
+        isautopadding = attr.getBoolean(R.styleable.RandomProfileIcon_auto_padding, false);
         background_color = attr.getColor(R.styleable.RandomProfileIcon_bg_color, context.getResources().getColor(android.R.color.darker_gray));
         padding_ic_px = (int) (attr.getDimension(R.styleable.RandomProfileIcon_icon_padding, 0)/context.getResources().getDisplayMetrics().density);
         boarder_width = (int) (attr.getDimension(R.styleable.RandomProfileIcon_border_width, 0)/context.getResources().getDisplayMetrics().density);
@@ -101,8 +103,26 @@ public class RandomProfileIcon extends RelativeLayout{
     }
 
     public void setIconPadding(int dp){
-        padding_ic_px = AppUtility.getAppinstance().dpToPx(dp);
-        icon.setPadding(padding_ic_px, padding_ic_px, padding_ic_px, padding_ic_px);
+        if (!isautopadding) {
+            padding_ic_px = AppUtility.getAppinstance().dpToPx(dp);
+            icon.setPadding(padding_ic_px, padding_ic_px, padding_ic_px, padding_ic_px);
+        }
+        else {
+            //0 : width, 1: height
+            int [] sizes = AppUtility.getAppinstance().getDisplaySize();
+            int auto_dp;
+            if (sizes[0] < 600)
+                auto_dp = 14;
+            else if (sizes[0] < 1200)
+                auto_dp = 13;
+            else
+                auto_dp = 12;
+
+
+            DLog.d("auto dp ::: "+auto_dp);
+            int auto_px = AppUtility.getAppinstance().dpToPx((dp == 10)? auto_dp-1 : auto_dp);
+            icon.setPadding(auto_px, auto_px, auto_px, auto_px);
+        }
     }
 
     class DrawCircle extends View {

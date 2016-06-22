@@ -179,8 +179,8 @@ public class SettingActivity extends AppCompatActivity {
 
         private String getDefaultbyte(){
             int byte_value;
-            //지역이 한국이라면 80byte, 외국이라면 140으로
-            if (AppUtility.getAppinstance().getCountryISO(SendSMSActivity.LOCALE_TYPE.LANGUAGE).equals("한국어"))
+            //서비스 네트워크 지역이 한국이라면 80byte, 외국이라면 140으로
+            if (AppUtility.getAppinstance().getCountryISO(AppUtility.LOCALE_TYPE.NETWORK).equals("KR"))
                 byte_value = 80;
             else
                 byte_value = 140;

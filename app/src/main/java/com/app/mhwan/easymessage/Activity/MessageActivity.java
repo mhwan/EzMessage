@@ -1,9 +1,9 @@
 package com.app.mhwan.easymessage.Activity;
 
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,23 +12,30 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.view.MenuItemCompat;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.CustomBase.DLog;
+import com.app.mhwan.easymessage.CustomBase.ExportExcel;
 import com.app.mhwan.easymessage.CustomBase.InterverToast;
 import com.app.mhwan.easymessage.CustomBase.MessageDBHelper;
 import com.app.mhwan.easymessage.CustomBase.MessageManager;
@@ -41,8 +48,15 @@ import com.app.mhwan.easymessage.CustomBase.SoftKeyboardStateWatcher;
 import com.app.mhwan.easymessage.CustomView.MessageAdapter;
 import com.app.mhwan.easymessage.CustomView.MessageItem;
 import com.app.mhwan.easymessage.R;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.regex.Pattern;
+
+import me.leolin.shortcutbadger.ShortcutBadger;
 
 public class MessageActivity extends AppCompatActivity implements NewMessageListener {
     private String uName, uNum;
@@ -53,8 +67,8 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     private SMSReceiver receiver;
     private MessageDBHelper messageDBHelper;
     private RecyclerView recyclerView;
-    private SearchView searchView;
-    private MenuItem searchitem;
+    //private SearchView searchView;
+    //private MenuItem searchitem;
     private int MAXBYTE;
 
     @Override
@@ -69,6 +83,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
         int nId = getIntent().getExtras().getInt(AppUtility.BasicInfo.KEY_NOTIFICATION_ID);
         NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         manager.cancel(nId);
+        ShortcutBadger.removeCount(this);
         initToolbar(uName, uNum);
         initView();
     }
@@ -328,6 +343,9 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_message, menu);
+
+        /*
+        검색 익스팬딩 오류..
         searchitem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchitem);
         SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
@@ -356,10 +374,11 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                 return false;
             }
         });
-
+*/
         return true;
     }
 
+    /*
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
@@ -373,7 +392,9 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_sms_send_permission), Toast.LENGTH_SHORT).show();
                 return;
         }
-    }
+    }*/
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -387,6 +408,13 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                 adapter.removeAllMessage();
                 Toast.makeText(MessageActivity.this, getString(R.string.message_delete_successfully), Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.sub_export_excel:
+                /*
+                Intent intent = new Intent(getApplicationContext(), ExportActivity.class);
+                intent.putParcelableArrayListExtra("messagelist", messageItems);
+                startActivity(intent);*/
+                ExportBottomSheetFragment bottomSheetFragment = new ExportBottomSheetFragment();
+                bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -417,5 +445,171 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
             messageDBHelper.changeMessageReadStatus(uNum);
         adapter.updateAllMessage(messageDBHelper.getAllMessageList(uNum));
         recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            //문자전송 권한에 대한 콜백을 받음
+            case AppUtility.BasicInfo.REQUEST_WRITE_STORAGE :
+                //권한을 승인한경우
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.okay_write_storage_permission), Toast.LENGTH_SHORT).show();
+                    //권한을 승인하지 않은경우
+                else
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_write_storage_permission), Toast.LENGTH_SHORT).show();
+                return;
+        }
+    }
+
+    public class ExportBottomSheetFragment extends BottomSheetDialogFragment{
+        private TextView start_date, end_date, date_period;
+        private Button export_button;
+        private EditText file_name;
+        private Spinner type_spinner;
+        private boolean isfirst = true;
+        private int sposition;
+        private BottomSheetBehavior bottombehavior;
+        private View bottom;
+        private Calendar start_calendar = Calendar.getInstance();
+        private Calendar end_calendar = Calendar.getInstance();
+        private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
+
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    dismiss();
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+            }
+        };
+
+        @Override
+        public void setupDialog(Dialog dialog, int style) {
+            super.setupDialog(dialog, style);
+            bottom = View.inflate(getContext(), R.layout.fragment_export_sheet, null);
+            dialog.setContentView(bottom);
+
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) ((View) bottom.getParent()).getLayoutParams();
+            CoordinatorLayout.Behavior behavior = params.getBehavior();
+
+            if( behavior != null && behavior instanceof BottomSheetBehavior ) {
+                bottombehavior = (BottomSheetBehavior) behavior;
+                bottombehavior.setBottomSheetCallback(mBottomSheetBehaviorCallback);
+                bottombehavior.setPeekHeight(AppUtility.getAppinstance().dpToPx(800));
+            }
+
+            start_date = (TextView) bottom.findViewById(R.id.export_text_start_date);
+            end_date = (TextView) bottom.findViewById(R.id.export_text_end_date);
+            date_period = (TextView) bottom.findViewById(R.id.export_period);
+            file_name = (EditText) bottom.findViewById(R.id.export_file_name);
+            type_spinner = (Spinner) bottom.findViewById(R.id.export_type_spinner);
+            export_button = (Button) bottom.findViewById(R.id.export_button);
+            export_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isExport()) {
+                        String filename = file_name.getText().toString();
+                        ExportExcel exportExcel = new ExportExcel(adapter.getMessageItems(), sposition, filename, start_calendar, end_calendar);
+                        boolean result = exportExcel.writeToExcel();
+                        dismiss();
+
+                        if (result)
+                            Toast.makeText(getApplicationContext(), getString(R.string.success_export)+"\n"+exportExcel.getComplete_path(), Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(getApplicationContext(), getString(R.string.fail_export), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            bottom.findViewById(R.id.export_start).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openDatePicker(start_calendar, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                            start_calendar.set(year, monthOfYear, dayOfMonth);
+                            start_calendar.set(Calendar.HOUR_OF_DAY, 0);
+                            start_calendar.set(Calendar.MINUTE, 0);
+                            start_calendar.set(Calendar.SECOND, 0);
+                            changeDatetext(start_date, start_calendar.getTime());
+                        }
+                    });
+                }
+            });
+            bottom.findViewById(R.id.export_end).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openDatePicker(end_calendar, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                            end_calendar.set(year, monthOfYear, dayOfMonth);
+                            end_calendar.set(Calendar.HOUR_OF_DAY, 23);
+                            end_calendar.set(Calendar.MINUTE, 59);
+                            end_calendar.set(Calendar.SECOND, 59);
+                            changeDatetext(end_date, end_calendar.getTime());
+                        }
+                    });
+                }
+            });
+
+            type_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    sposition = position;
+                    ((TextView)parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.colorLightprimary));
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            MessageItem first = adapter.getFirstMessageItem();
+            start_calendar.setTime(AppUtility.getAppinstance().getDate(first.getTime(), AppUtility.BasicInfo.DB_DATETIME_FORMAT));
+            changeDatetext(start_date, start_calendar.getTime());
+            changeDatetext(end_date, end_calendar.getTime());
+        }
+
+        private void changeDatetext(TextView textView, Date date){
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
+            textView.setText(dateFormat.format(date));
+            if (start_calendar.after(end_calendar))
+                Toast.makeText(getApplicationContext(), getString(R.string.uncorrect_period), Toast.LENGTH_SHORT).show();
+
+            if (!isfirst) {
+                int diffInDays = (int) ((end_calendar.getTime().getTime() - start_calendar.getTime().getTime()) / (1000 * 60 * 60 * 24));
+                date_period.setText(diffInDays + getString(R.string.period_days));
+            }
+        }
+
+        private void openDatePicker(Calendar calendar, DatePickerDialog.OnDateSetListener listener){
+            isfirst = false;
+            DatePickerDialog datepicker = DatePickerDialog.newInstance(listener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            datepicker.vibrate(true);
+            datepicker.setAccentColor(getResources().getColor(R.color.colorPrimary));
+            datepicker.setTitle(getString(R.string.date_picker_title));
+            datepicker.show(MessageActivity.this.getFragmentManager(), "datepicker");
+        }
+
+        private boolean isExport(){
+            if (!new RequestPermission(getActivity(), 4).isPermission(bottom))
+                return false;
+            if (start_calendar.after(end_calendar)) {
+                Toast.makeText(getApplicationContext(), getString(R.string.invalid_period_export), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            String name = file_name.getText().toString();
+            if (name.isEmpty()||!Pattern.matches("^[a-zA-Z0-9가-힣]*$", name)){
+                Toast.makeText(getApplicationContext(), getString(R.string.invalid_filename_export), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            return true;
+        }
     }
 }

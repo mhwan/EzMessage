@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             mhwan:icon_src="@mipmap/ic_person"
+            mhwan:auto_padding="true"
             mhwan:icon_padding="12.5dp">
         </com.app.mhwan.easymessage.CustomView.RandomProfileIcon>
 

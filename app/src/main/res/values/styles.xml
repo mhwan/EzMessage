@@ -63,6 +63,9 @@
         <item name="colorControlNormal">@color/colorDarkPrimary</item>
         <item name="colorControlActivated">@color/colorPrimary</item>
     </style>
+    <style name="My.Spinner.Style" parent="Base.Widget.AppCompat.Spinner">
+        <item name="android:textColor">@color/colorLightprimary</item>
+    </style>
     <!--
     <style name="MySearchview" parent="Base.Widget.AppCompat.SearchView">
         <item name="android:colorControlNormal">@color/colorPrimary</item>

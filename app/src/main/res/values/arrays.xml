@@ -20,6 +20,7 @@
         <item>@string/call_permission_request</item>
         <item>@string/contact_permission_request</item>
         <item>@string/phone_state_permission_request</item>
+        <item>@string/request_write_storage</item>
     </string-array>
     <array name="user_color">
         <item>@color/light_red</item>
@@ -61,5 +62,21 @@
         <item>0</item>
         <item>1</item>
         <item>2</item>
+    </string-array>
+    <string-array name="message_type_export">
+        <item>@string/all_messages</item>
+        <item>@string/outgoing_message</item>
+        <item>@string/incomming_message</item>
+    </string-array>
+    <string-array name="excel_title">
+        <item>@string/cell_phone_number</item>
+        <item>@string/title_type</item>
+        <item>@string/message_content</item>
+        <item>@string/title_time</item>
+        <item>@string/title_note</item>
+    </string-array>
+    <string-array name="inoroutgoing">
+        <item>@string/outgoing</item>
+        <item>@string/incoming</item>
     </string-array>
 </resources>

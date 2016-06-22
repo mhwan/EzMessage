@@ -104,6 +104,7 @@ public class SMSReceiver extends BroadcastReceiver {
                     String message = "";
                     String number = null;
                     Date date = null;
+                    long timemillis = 0;
                     for (int i = 0; i < smsMessage.length; i++) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             String format = bundle.getString("format");
@@ -114,10 +115,12 @@ public class SMSReceiver extends BroadcastReceiver {
                         message += smsMessage[i].getDisplayMessageBody();
                         if (number == null && date == null) {
                             number = smsMessage[i].getDisplayOriginatingAddress();
-                            date = new Date(smsMessage[i].getTimestampMillis());
+                            timemillis = smsMessage[i].getTimestampMillis();
+
+                            date = new Date(timemillis);
                         }
                     }
-                    DLog.d("new : "+message+" "+number);
+                    DLog.d("new : "+message+" "+number+" "+timemillis);
                     SimpleDateFormat format = new SimpleDateFormat(AppUtility.BasicInfo.DB_DATETIME_FORMAT);
                     String sDate = format.format(date);
                     number = number.replace("-", "");

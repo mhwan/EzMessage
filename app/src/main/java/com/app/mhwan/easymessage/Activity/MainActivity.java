@@ -296,5 +296,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private enum InitTabType{ DEFAULT_FIRST, NOT_FIST, NOTIFICATION }
 }

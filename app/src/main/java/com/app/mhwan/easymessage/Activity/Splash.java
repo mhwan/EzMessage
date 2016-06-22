@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.CustomBase.RequestPermission;
@@ -27,8 +28,10 @@ public class Splash extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hideEverything();
         setContentView(R.layout.activity_splash);
+        ImageView splash = (ImageView) findViewById(R.id.bg_splash);
+        splash.setImageResource(R.drawable.splash);
+        hideEverything();
     }
 
     @Override

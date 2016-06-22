@@ -85,4 +85,37 @@ public class MessageItem {
     public void setRequest_code(int request_code) {
         this.request_code = request_code;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MessageItem item = (MessageItem) o;
+
+        if (type != item.type) return false;
+        if (request_code != item.request_code) return false;
+        if (is_read != item.is_read) return false;
+        if (is_last_message != item.is_last_message) return false;
+        if (id != item.id) return false;
+        if (color_id != item.color_id) return false;
+        if (!ph_number.equals(item.ph_number)) return false;
+        if (content != null ? !content.equals(item.content) : item.content != null) return false;
+        return time.equals(item.time);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = ph_number.hashCode();
+        result = 31 * result + (content != null ? content.hashCode() : 0);
+        result = 31 * result + time.hashCode();
+        result = 31 * result + type;
+        result = 31 * result + request_code;
+        result = 31 * result + (is_read ? 1 : 0);
+        result = 31 * result + (is_last_message ? 1 : 0);
+        result = 31 * result + id;
+        result = 31 * result + color_id;
+        return result;
+    }
 }

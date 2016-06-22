@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
+import me.leolin.shortcutbadger.ShortcutBadger;
+
 /**
  * Created by Mhwan on 2016. 6. 7..
  */
@@ -72,11 +74,12 @@ public class NotificationHelper {
                 intent.putExtra(AppUtility.BasicInfo.KEY_NOTIFICATION_ID, notifi_id);
 
                 String name = AppUtility.getAppinstance().getUserName(snumber);
-                builder.setContentTitle((name != null)? name : snumber)
+                builder.setContentTitle((name != null)? name : AppUtility.getAppinstance().changeNumberFormat(snumber))
                         .setContentText(scontent)
                         .setNumber(number)
                         .setWhen(time)
                         .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+                ShortcutBadger.applyCount(context, number);
                 break;
             case SCHEDULE_MESSAGE:
                 notifi_id = ID_SCHEDULE_NOTIFICATION;
@@ -103,6 +106,7 @@ public class NotificationHelper {
         }
 
         Notification notification = builder.build();
+        notification.defaults |= Notification.FLAG_AUTO_CANCEL;
         switch (Integer.parseInt(preferences.getString(SettingActivity.KEY_NOTIFICATION_TYPE, ""))) {
             //진동
             case 0:

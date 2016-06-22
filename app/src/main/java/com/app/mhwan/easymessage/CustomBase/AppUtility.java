@@ -8,13 +8,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 
-import com.app.mhwan.easymessage.Activity.SendSMSActivity;
 import com.app.mhwan.easymessage.CustomView.ContactItem;
 import com.app.mhwan.easymessage.R;
 
@@ -125,20 +128,30 @@ public class AppUtility {
 
     public String changeNumberFormat(String number){
         number = number.replaceAll("-", "");
-        //집 전화번호
-        if (number.length() == 10 || number.startsWith("02")) {
-            //서울
-            if (number.startsWith("02")) {
-                int length = number.length();
-                number = number.substring(0, 2)+ "-" + number.substring(2, length-4)+ "-"+number.substring(length-4, length);
+
+        if (getCountryISO(LOCALE_TYPE.NETWORK).equals("KR")) {
+            //집 전화번호
+            if (number.length() == 10 || number.startsWith("02")) {
+                //서울
+                if (number.startsWith("02")) {
+                    int length = number.length();
+                    number = number.substring(0, 2) + "-" + number.substring(2, length - 4) + "-" + number.substring(length - 4, length);
+                }
+                //나머지
+                else
+                    number = number.substring(0, 3) + "-" + number.substring(3, 6) + "-" + number.substring(6);
+            } else if (number.length() > 8) {
+                number = number.substring(0, 3) + "-" + number.substring(3, 7) + "-" + number.substring(7);
+            } else if (number.length() == 8) {
+                number = number.substring(0, 4) + "-" + number.substring(4);
             }
-            //나머지
+        } else {
+            if (number.length() == 10)
+                number = number.substring(0, 3) + "-" + number.substring(3, 6)+ "-"+number.substring(6);
+            else if (number.startsWith("1"))
+                number = number.substring(0, 1) + "-" + number.substring(1, 4)+ "-"+number.substring(4, 7)+"-"+number.substring(7);
             else
-                number = number.substring(0, 3) + "-" + number.substring(3, 6) + "-" + number.substring(6);
-        } else if (number.length() > 8) {
-            number = number.substring(0, 3) + "-" + number.substring(3, 7) + "-" + number.substring(7);
-        } else if (number.length() == 8) {
-            number = number.substring(0, 4) + "-" + number.substring(4);
+                number = number.substring(0, 3) + "-" + number.substring(3, 6)+ "-"+number.substring(6);
         }
 
         return number;
@@ -215,16 +228,36 @@ public class AppUtility {
         activity.finish();
     }
 
-    public String getCountryISO(SendSMSActivity.LOCALE_TYPE type) {
+
+    /**
+     * return value : network (KR, US 등), Language (한국어, 등)
+     */
+    public String getCountryISO(LOCALE_TYPE type) {
         String countryCode = "";
-        if (type.equals(SendSMSActivity.LOCALE_TYPE.NETWORK)) {
+        if (type.equals(LOCALE_TYPE.NETWORK)) {
             TelephonyManager tm = (TelephonyManager) AppContext.getContext().getSystemService(AppContext.getContext().TELEPHONY_SERVICE);
             countryCode = tm.getNetworkCountryIso();
-        } else if (type.equals(SendSMSActivity.LOCALE_TYPE.LANGUAGE)) {
+            DLog.d("Network : " + countryCode);
+        } else if (type.equals(LOCALE_TYPE.LANGUAGE)) {
             countryCode = AppContext.getContext().getResources().getConfiguration().locale.getDisplayLanguage();
+            DLog.d("Language : " + countryCode);
         }
-        DLog.i("country ; " + countryCode);
         return countryCode.toUpperCase();
+    }
+
+    public int[] getDisplaySize(){
+        Display display = ((WindowManager) AppContext.getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int width, height;
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
+            width = display.getWidth();
+            height = display.getHeight();
+        } else {
+            Point size = new Point();
+            display.getSize(size);
+            width = size.x;
+            height = size.y;
+        }
+        return new int[] { width, height };
     }
 
     public boolean isToday(String sDate, String sFormat){
@@ -247,6 +280,20 @@ public class AppUtility {
         return (cToday.get(Calendar.ERA) == cDate.get(Calendar.ERA)) && (cToday.get(Calendar.YEAR) == cDate.get(Calendar.YEAR)) && (cToday.get(Calendar.DAY_OF_YEAR) == cDate.get(Calendar.DAY_OF_YEAR));
     }
 
+    public Date getDate(String sDate, String sFormat){
+        Date date = null;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(sFormat);
+        try {
+            date = simpleDateFormat.parse(sDate);
+
+            if (date == null)
+                throw new IllegalArgumentException("Date is null");
+        } catch (ParseException | IllegalArgumentException e){
+            e.printStackTrace();
+        }
+
+        return date;
+    }
     public String changeDateTimeFormat(String time, String original_format, String new_format){
         SimpleDateFormat fOriginal = new SimpleDateFormat(original_format);
         SimpleDateFormat fNew = new SimpleDateFormat(new_format);
@@ -352,6 +399,8 @@ public class AppUtility {
         }
     }
 
+    public enum LOCALE_TYPE { NETWORK, LANGUAGE }
+
     private class AppRunningCheck extends AsyncTask<Void, Void, Boolean>{
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -381,6 +430,7 @@ public class AppUtility {
         public static final int REQUEST_READ_CONTACT = 0x42;
         public static final int REQUEST_SEND_SMS = 0x0;
         public static final int REQUEST_PHONE_STATE = 0x52;
+        public static final int REQUEST_WRITE_STORAGE = 0x68;
 
         //Send message Result code
         public static final int SEND_REQUEST = 0x121;
