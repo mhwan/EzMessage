@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.NotificationCompat;
 
 import com.app.mhwan.easymessage.Activity.MainActivity;
@@ -51,6 +52,13 @@ public class NotificationHelper {
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
                 .setLights(0xaa00ff, 3000, 100);
 
+
+        Intent backintent = new Intent(context, MainActivity.class);
+        backintent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+
+        TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(context);
+        taskStackBuilder.addParentStack(MainActivity.class);
+
         int notifi_id = 0;
         Intent intent;
         switch (type) {
@@ -70,15 +78,16 @@ public class NotificationHelper {
                     intent = new Intent(context, MessageActivity.class);
                     intent.putExtra(AppUtility.BasicInfo.U_NAME, AppUtility.getAppinstance().getUserName(snumber));
                     intent.putExtra(AppUtility.BasicInfo.U_NUMBER, snumber);
+                    taskStackBuilder.addNextIntent(backintent);
+
                 }
                 intent.putExtra(AppUtility.BasicInfo.KEY_NOTIFICATION_ID, notifi_id);
-
+                taskStackBuilder.addNextIntent(intent);
                 String name = AppUtility.getAppinstance().getUserName(snumber);
                 builder.setContentTitle((name != null)? name : AppUtility.getAppinstance().changeNumberFormat(snumber))
                         .setContentText(scontent)
                         .setNumber(number)
-                        .setWhen(time)
-                        .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+                        .setWhen(time);
                 ShortcutBadger.applyCount(context, number);
                 break;
             case SCHEDULE_MESSAGE:
@@ -93,18 +102,19 @@ public class NotificationHelper {
                     intent = new Intent(context, MessageActivity.class);
                     intent.putExtra(AppUtility.BasicInfo.U_NAME, AppUtility.getAppinstance().getUserName(numberlist.get(0)));
                     intent.putExtra(AppUtility.BasicInfo.U_NUMBER, numberlist.get(0));
+                    taskStackBuilder.addNextIntent(backintent);
                 }
                 intent.putExtra(AppUtility.BasicInfo.KEY_NOTIFICATION_ID, notifi_id);
-
+                taskStackBuilder.addNextIntent(intent);
                 builder.setContentTitle(title)
                         .setContentText(content)
                         .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText(content))
                         .setNumber(numberlist.size())
-                        .setWhen(System.currentTimeMillis())
-                        .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+                        .setWhen(System.currentTimeMillis());
                 break;
         }
 
+        builder.setContentIntent(taskStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT));
         Notification notification = builder.build();
         notification.defaults |= Notification.FLAG_AUTO_CANCEL;
         switch (Integer.parseInt(preferences.getString(SettingActivity.KEY_NOTIFICATION_TYPE, ""))) {

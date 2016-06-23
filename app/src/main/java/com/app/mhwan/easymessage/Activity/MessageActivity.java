@@ -10,12 +10,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -509,6 +511,11 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
             file_name = (EditText) bottom.findViewById(R.id.export_file_name);
             type_spinner = (Spinner) bottom.findViewById(R.id.export_type_spinner);
             export_button = (Button) bottom.findViewById(R.id.export_button);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                export_button.setBackgroundTintList(MessageActivity.this.getResources().getColorStateList(R.color.colorPrimary));
+            } else {
+                export_button.setBackgroundColor(ContextCompat.getColor(MessageActivity.this, R.color.colorPrimary));
+            }
             export_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -27,6 +27,7 @@
         android:theme="@style/MyTheme">
         <activity
             android:name=".Activity.Splash"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,7 +40,8 @@
             android:theme="@style/MyTheme" />
         <activity
             android:name=".Activity.MainActivity"
-            android:theme="@style/MyTheme" />
+            android:theme="@style/MyTheme">
+        </activity>
 
         <receiver android:name=".CustomBase.SMSReceiver">
             <intent-filter>

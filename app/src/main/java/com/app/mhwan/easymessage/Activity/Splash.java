@@ -3,12 +3,14 @@ package com.app.mhwan.easymessage.Activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
 import com.app.mhwan.easymessage.CustomBase.RequestPermission;
@@ -29,16 +31,28 @@ public class Splash extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        ImageView splash = (ImageView) findViewById(R.id.bg_splash);
-        splash.setImageResource(R.drawable.splash);
+        setBackground(findViewById(R.id.splash), R.drawable.splash);
         hideEverything();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (new RequestPermission(this, 2).isPermission(findViewById(R.id.root_splash)) && new RequestPermission(this, 3).isPermission(findViewById(R.id.root_splash)))
-            handler.postDelayed(startMainActivity, 1100);
+        if (new RequestPermission(this, 2).isPermission(findViewById(R.id.splash)) && new RequestPermission(this, 3).isPermission(findViewById(R.id.splash)))
+            handler.postDelayed(startMainActivity, 1000);
+    }
+
+    private void setBackground(View view, int resource_id){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        options.inSampleSize = 2;
+        options.inPurgeable = true;
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resource_id, options);
+        if (Build.VERSION.SDK_INT >= 16) {
+            view.setBackground(new BitmapDrawable(getResources(), bitmap));
+        } else {
+            view.setBackgroundDrawable(new BitmapDrawable(getResources(), bitmap));
+        }
     }
 
     private void hideEverything(){
