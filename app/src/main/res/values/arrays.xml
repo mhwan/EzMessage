@@ -60,9 +60,9 @@
         <item>@string/setting_silent</item>
     </string-array>
     <string-array name="notification_type_value">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
+        <item>@string/value_zero</item>
+        <item>@string/value_one</item>
+        <item>@string/value_two</item>
     </string-array>
     <string-array name="message_type_export">
         <item>@string/all_messages</item>
