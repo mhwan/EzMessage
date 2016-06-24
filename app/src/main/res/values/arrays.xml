@@ -21,6 +21,7 @@
         <item>@string/contact_permission_request</item>
         <item>@string/phone_state_permission_request</item>
         <item>@string/request_write_storage</item>
+        <item>@string/read_sms_permission_request</item>
     </string-array>
     <array name="user_color">
         <item>@color/light_red</item>

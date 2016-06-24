@@ -115,4 +115,5 @@
     <string name="request_write_storage">파일을 추출하시려면 외부 저장소에 쓰기 권한이 필요합니다.</string>
     <string name="okay_write_storage_permission">권한이 승인되었습니다. 추출버튼을 눌러 파일을 추출하세요.</string>
     <string name="no_write_storage_permission">권한이 승인되지 않아 파일을 추출할 수 없습니다.</string>
+    <string name="read_sms_permission_request">이 앱을 실행시키려면 메시지 읽기 권한이 필요합니다.</string>
 </resources>

@@ -380,23 +380,6 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
         return true;
     }
 
-    /*
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            //문자전송 권한에 대한 콜백을 받음
-            case AppUtility.BasicInfo.REQUEST_SEND_SMS:
-                //권한을 승인한경우
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    sendMessage();
-                    //권한을 승인하지 않은경우
-                else
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_sms_send_permission), Toast.LENGTH_SHORT).show();
-                return;
-        }
-    }*/
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -453,7 +436,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            //문자전송 권한에 대한 콜백을 받음
+            //엑셀파일 추출할때
             case AppUtility.BasicInfo.REQUEST_WRITE_STORAGE :
                 //권한을 승인한경우
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
@@ -462,6 +445,24 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                 else
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_write_storage_permission), Toast.LENGTH_SHORT).show();
                 return;
+            //메시지 전송버튼 눌렀을때
+            case AppUtility.BasicInfo.REQUEST_SEND_SMS :
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.okay_sms_send_permission), Toast.LENGTH_SHORT).show();
+                    //권한을 승인하지 않은경우
+                else
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_sms_send_permission), Toast.LENGTH_SHORT).show();
+                return;
+
+            //
+            case AppUtility.BasicInfo.REQUEST_CALL :
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    startActivity(new Intent("android.intent.action.CALL", Uri.parse("tel:" + uNum)));
+                    //권한을 승인하지 않은경우
+                else
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_call_permission), Toast.LENGTH_SHORT).show();
+                return;
+
         }
     }
 

@@ -5,6 +5,7 @@
     <string name="cancel">Cancel</string>
      <string name="cell_phone_number">Cell phone</string> 
     <string name="contact_permission_request">Contact reading permission is required to launch this app.</string>
+    <string name="read_sms_permission_request">SMS reading permission is required to launch this app.</string>
      <string name="contacts_name">My Contacts</string> 
     <string name="empty_content">Input your message.</string>
       

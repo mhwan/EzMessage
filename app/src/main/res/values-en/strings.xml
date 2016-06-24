@@ -115,4 +115,5 @@
     <string name="request_write_storage">Write external storage permission is required to export file.</string>
     <string name="okay_write_storage_permission">Permission is granted. Please click export button to export file.</string>
     <string name="no_write_storage_permission">You can\'t export to Excel file because permission was denied.</string>
+    <string name="read_sms_permission_request">SMS reading permission is required to launch this app.</string>
 </resources>

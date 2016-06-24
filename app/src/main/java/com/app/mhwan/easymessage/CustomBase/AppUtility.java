@@ -431,6 +431,7 @@ public class AppUtility {
         public static final int REQUEST_SEND_SMS = 0x0;
         public static final int REQUEST_PHONE_STATE = 0x52;
         public static final int REQUEST_WRITE_STORAGE = 0x68;
+        public static final int REQUEST_READ_SMS = 0x62;
 
         //Send message Result code
         public static final int SEND_REQUEST = 0x121;

@@ -38,7 +38,8 @@ public class Splash extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (new RequestPermission(this, 2).isPermission(findViewById(R.id.splash)) && new RequestPermission(this, 3).isPermission(findViewById(R.id.splash)))
+        if (new RequestPermission(this, 2).isPermission(findViewById(R.id.splash)) && new RequestPermission(this, 3).isPermission(findViewById(R.id.splash))
+                && new RequestPermission(this, 5).isPermission(findViewById(R.id.splash)))
             handler.postDelayed(startMainActivity, 1000);
     }
 
@@ -70,6 +71,7 @@ public class Splash extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
+            case AppUtility.BasicInfo.REQUEST_READ_SMS :
             case AppUtility.BasicInfo.REQUEST_READ_CONTACT :
             case AppUtility.BasicInfo.REQUEST_PHONE_STATE :
                 //권한을 승인한경우
