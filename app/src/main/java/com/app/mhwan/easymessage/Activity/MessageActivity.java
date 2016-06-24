@@ -65,7 +65,8 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
     private EditText mInputtext;
     private boolean ischange = false;
     private ArrayList<MessageItem> messageItems;
-    private MessageAdapter adapter;
+    private static MessageAdapter adapter;
+    private static Context context;
     private SMSReceiver receiver;
     private MessageDBHelper messageDBHelper;
     private RecyclerView recyclerView;
@@ -88,6 +89,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
         ShortcutBadger.removeCount(this);
         initToolbar(uName, uNum);
         initView();
+        context = MessageActivity.this;
     }
 
     private void initView() {
@@ -466,7 +468,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
         }
     }
 
-    public class ExportBottomSheetFragment extends BottomSheetDialogFragment{
+    public static class ExportBottomSheetFragment extends BottomSheetDialogFragment{
         private TextView start_date, end_date, date_period;
         private Button export_button;
         private EditText file_name;
@@ -513,9 +515,9 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
             type_spinner = (Spinner) bottom.findViewById(R.id.export_type_spinner);
             export_button = (Button) bottom.findViewById(R.id.export_button);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                export_button.setBackgroundTintList(MessageActivity.this.getResources().getColorStateList(R.color.colorPrimary));
+                export_button.setBackgroundTintList(context.getResources().getColorStateList(R.color.colorPrimary));
             } else {
-                export_button.setBackgroundColor(ContextCompat.getColor(MessageActivity.this, R.color.colorPrimary));
+                export_button.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
             }
             export_button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -527,9 +529,9 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
                         dismiss();
 
                         if (result)
-                            Toast.makeText(getApplicationContext(), getString(R.string.success_export)+"\n"+exportExcel.getComplete_path(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, getString(R.string.success_export)+"\n"+exportExcel.getComplete_path(), Toast.LENGTH_SHORT).show();
                         else
-                            Toast.makeText(getApplicationContext(), getString(R.string.fail_export), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, getString(R.string.fail_export), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -586,7 +588,7 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
             textView.setText(dateFormat.format(date));
             if (start_calendar.after(end_calendar))
-                Toast.makeText(getApplicationContext(), getString(R.string.uncorrect_period), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getString(R.string.uncorrect_period), Toast.LENGTH_SHORT).show();
 
             if (!isfirst) {
                 int diffInDays = (int) ((end_calendar.getTime().getTime() - start_calendar.getTime().getTime()) / (1000 * 60 * 60 * 24));
@@ -596,24 +598,25 @@ public class MessageActivity extends AppCompatActivity implements NewMessageList
 
         private void openDatePicker(Calendar calendar, DatePickerDialog.OnDateSetListener listener){
             isfirst = false;
+            MessageActivity activity = (MessageActivity) context;
             DatePickerDialog datepicker = DatePickerDialog.newInstance(listener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
             datepicker.vibrate(true);
             datepicker.setAccentColor(getResources().getColor(R.color.colorPrimary));
             datepicker.setTitle(getString(R.string.date_picker_title));
-            datepicker.show(MessageActivity.this.getFragmentManager(), "datepicker");
+            datepicker.show(activity.getFragmentManager(), "datepicker");
         }
 
         private boolean isExport(){
             if (!new RequestPermission(getActivity(), 4).isPermission(bottom))
                 return false;
             if (start_calendar.after(end_calendar)) {
-                Toast.makeText(getApplicationContext(), getString(R.string.invalid_period_export), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getString(R.string.invalid_period_export), Toast.LENGTH_SHORT).show();
                 return false;
             }
 
             String name = file_name.getText().toString();
             if (name.isEmpty()||!Pattern.matches("^[a-zA-Z0-9가-힣]*$", name)){
-                Toast.makeText(getApplicationContext(), getString(R.string.invalid_filename_export), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getString(R.string.invalid_filename_export), Toast.LENGTH_SHORT).show();
                 return false;
             }
 
