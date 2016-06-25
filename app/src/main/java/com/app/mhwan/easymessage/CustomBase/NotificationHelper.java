@@ -122,7 +122,7 @@ public class NotificationHelper {
         builder.setContentIntent(taskStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT));
         Notification notification = builder.build();
         notification.defaults |= Notification.FLAG_AUTO_CANCEL;
-        switch (Integer.parseInt(preferences.getString(SettingActivity.KEY_NOTIFICATION_TYPE, ""))) {
+        switch (Integer.parseInt(preferences.getString(SettingActivity.KEY_NOTIFICATION_TYPE, "0"))) {
             //진동
             case 0:
                 notification.defaults |= Notification.DEFAULT_VIBRATE;
