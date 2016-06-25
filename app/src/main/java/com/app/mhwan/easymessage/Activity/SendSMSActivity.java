@@ -427,7 +427,7 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
                         item.setNumberlist(TextUtils.join(MessageManager.NUM_SEPERATOR, numberList));
                         item.setContent(msContent);
                         item.setIssend(false);
-                        item.setTimemillis(scheduled_date.getTimeInMillis()-20000);
+                        item.setTimemillis(scheduled_date.getTimeInMillis());
                         int request = dbHelper.addSchedule(item);
                         addScheduleToDB(numberList, msContent, scheduled_date.getTime(), request);
                         Intent intent = new Intent(AppUtility.BasicInfo.SCHEDULED_SEND_ACTION);
@@ -437,10 +437,10 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
                         PendingIntent pendingIntent = PendingIntent.getBroadcast(SendSMSActivity.this, request, intent, 0);
                         AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, scheduled_date.getTimeInMillis()-5000, pendingIntent);
+                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, scheduled_date.getTimeInMillis(), pendingIntent);
                         }
                         else {
-                            alarmManager.set(AlarmManager.RTC_WAKEUP, scheduled_date.getTimeInMillis()-5000, pendingIntent);
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, scheduled_date.getTimeInMillis(), pendingIntent);
                         }
                         finishedSendSMS(SMS_RESULT.SEND_RESERVED);
                     }

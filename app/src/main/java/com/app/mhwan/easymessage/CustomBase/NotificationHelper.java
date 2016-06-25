@@ -43,7 +43,7 @@ public class NotificationHelper {
         boolean ispopup = preferences.getBoolean(SettingActivity.KEY_POPUP_NOTIFICATION, true);
 
         //알림, 팝업 알림이 모두 참일경우를 제외하고 알림x
-        if (!(isnotifi && ispopup))
+        if (!isnotifi)
             return;
 
         NotificationManager nManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -71,6 +71,12 @@ public class NotificationHelper {
                 //안읽은 메시지가 여러개일때
                 int number = dbHelper.getNoReadMessageNumber();
                 boolean isdifferent = dbHelper.isDifferentDestination();
+
+                ShortcutBadger.applyCount(context, number);
+                if (!ispopup) {
+                    nManager = null;
+                    return;
+                }
                 if (number > 1 && isdifferent) {
                     intent = new Intent(context, MainActivity.class);
                     intent.putExtra(AppUtility.BasicInfo.KEY_INTENT_SCHEDULE, false);
@@ -88,7 +94,6 @@ public class NotificationHelper {
                         .setContentText(scontent)
                         .setNumber(number)
                         .setWhen(time);
-                ShortcutBadger.applyCount(context, number);
                 break;
             case SCHEDULE_MESSAGE:
                 notifi_id = ID_SCHEDULE_NOTIFICATION;

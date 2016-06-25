@@ -94,6 +94,8 @@ public class SettingActivity extends AppCompatActivity {
             //preference 값 초기화
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             changeSummary(pref_message_length, sharedPreferences.getString("key_message_byte", "80"));
+            if (pref_notifi_type.getValue() == null)
+                pref_notifi_type.setValueIndex(0);
             changeSummary(pref_notifi_type, notify[Integer.valueOf(sharedPreferences.getString("key_notification_type", "0"))]);
 
         }
