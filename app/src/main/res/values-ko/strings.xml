@@ -119,4 +119,5 @@
     <string name="value_zero">0</string>
     <string name="value_one">1</string>
     <string name="value_two">2</string>
+    <string name="empty_message_storage">메시지함이 비었습니다.</string>
 </resources>

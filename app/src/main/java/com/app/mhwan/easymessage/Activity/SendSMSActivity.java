@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -525,6 +527,14 @@ public class SendSMSActivity extends AppCompatActivity implements TokenCompleteT
         @Override
         protected void onPreExecute() {
             watingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            watingDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dialog) {
+                    ProgressBar v = (ProgressBar)watingDialog.findViewById(android.R.id.progress);
+                    v.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(SendSMSActivity.this, R.color.colorLightprimary),
+                            android.graphics.PorterDuff.Mode.MULTIPLY);
+                }
+            });
             watingDialog.setCanceledOnTouchOutside(false);
             watingDialog.setCancelable(false);
             watingDialog.show();

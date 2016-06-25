@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.app.mhwan.easymessage.Activity.MainActivity;
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
@@ -103,7 +104,12 @@ public class SMSFragment extends Fragment implements MainActivity.BackKeyPressed
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.addItemDecoration(new DividerItemDecoration(activity, DividerItemDecoration.VERTICAL_LIST, R.drawable.line_divider));
         mListItems = messageDBHelper.getAllLastMessageList();
-        mAdapter = new MessageListAdapter(activity, mListItems, messageDBHelper);
+        TextView empty_sign = (TextView) view.findViewById(R.id.empty_messages);
+        if (mListItems.isEmpty())
+            empty_sign.setVisibility(View.VISIBLE);
+        else
+            empty_sign.setVisibility(View.GONE);
+        mAdapter = new MessageListAdapter(activity, mListItems, messageDBHelper, empty_sign, activity.getSignview());
         ((MessageListAdapter) mAdapter).setMode(Attributes.Mode.Single);
         recyclerView.setAdapter(mAdapter);
         setSignviewVisible();

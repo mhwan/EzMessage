@@ -121,4 +121,5 @@
     <string name="value_zero">0</string>
     <string name="value_one">1</string>
     <string name="value_two">2</string>
+    <string name="empty_message_storage">Empty message box.</string>
 </resources>

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,11 +40,15 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
     private ArrayList<MessageListItem> mListItems;
     private int[] light_color_array;
     private MessageDBHelper messageDBHelper;
+    private TextView empty_sign;
+    private View signview;
 
-    public MessageListAdapter(Context context, ArrayList<MessageListItem> items, MessageDBHelper messageDBHelper){
+    public MessageListAdapter(Context context, ArrayList<MessageListItem> items, MessageDBHelper messageDBHelper, TextView empty_sign, View signview){
         this.context = context;
         this.mListItems = items;
         this.messageDBHelper = messageDBHelper;
+        this.empty_sign = empty_sign;
+        this.signview = signview;
         light_color_array = context.getResources().getIntArray(R.array.user_color);
     }
     @Override
@@ -102,6 +107,8 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
                             notifyItemRangeChanged(position, mListItems.size());
                             mItemManger.closeAllItems();
                             Toast.makeText(context, context.getString(R.string.message_delete_successfully), Toast.LENGTH_SHORT).show();
+                            setEmpty_sign();
+                            setSignview();
                         }
                         else
                             Toast.makeText(context, context.getString(R.string.message_delete_failed), Toast.LENGTH_SHORT).show();
@@ -176,8 +183,24 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
         mListItems.clear();
         mListItems.addAll(list);
         notifyDataSetChanged();
+        setEmpty_sign();
+        setSignview();
     }
 
+    private void setEmpty_sign(){
+        if (mListItems.isEmpty()) {
+            empty_sign.setVisibility(View.VISIBLE);
+        }
+        else
+            empty_sign.setVisibility(View.GONE);
+    }
+
+    private void setSignview(){
+        if (messageDBHelper.getNoReadMessageNumber()>0)
+            signview.setVisibility(View.VISIBLE);
+        else
+            signview.setVisibility(View.GONE);
+    }
     public static class ListViewHolder extends RecyclerView.ViewHolder{
         SwipeLayout swipeLayout;
         TextView mDate, mName, mContent, mCount;
@@ -219,7 +242,7 @@ public class MessageListAdapter extends RecyclerSwipeAdapter<MessageListAdapter.
                 @Override
                 public void onShow(DialogInterface dialog) {
                     ProgressBar v = (ProgressBar)progressDialog.findViewById(android.R.id.progress);
-                    v.getIndeterminateDrawable().setColorFilter(context.getResources().getColor(R.color.colorLightprimary),
+                    v.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(context, R.color.colorLightprimary),
                             android.graphics.PorterDuff.Mode.MULTIPLY);
                 }
             });
