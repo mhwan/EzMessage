@@ -201,6 +201,10 @@ public class AppUtility {
             }
 
             contactItems = new ArrayList<>(hashlist);
+
+            for (int i =0; i<contactItems.size(); i++){
+                contactItems.get(i).setId(i);
+            }
             return contactItems;
         }
     }

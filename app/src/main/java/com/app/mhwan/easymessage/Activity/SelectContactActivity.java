@@ -81,15 +81,16 @@ public class SelectContactActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position != 0) {
-                    boolean checked = adapter.getItem(position-1).getChecked();
+                    ContactItem item = adapter.getItem(position-1);
+                    boolean checked = adapter.getOriginalItemChecked(item.getId());
                     if (checked)
                         num--;
                     else
                         num++;
-                    DLog.d(position + " click!");
-                    DLog.i("number : "+num);
+
                     setToolbarTitle();
-                    adapter.getItem(position - 1).setChecked(!checked);
+                    item.setChecked(!checked);
+                    adapter.setOriginalItemChecked(item.getId(), !checked);
                     adapter.notifyDataSetChanged();
                 }
             }

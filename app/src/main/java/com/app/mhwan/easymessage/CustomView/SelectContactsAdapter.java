@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.app.mhwan.easymessage.CustomBase.AppContext;
 import com.app.mhwan.easymessage.CustomBase.AppUtility;
+import com.app.mhwan.easymessage.CustomBase.DLog;
 import com.app.mhwan.easymessage.R;
 import com.mogua.localization.KoreanTextMatcher;
 
@@ -27,10 +28,12 @@ public class SelectContactsAdapter extends BaseAdapter implements Filterable {
     private ArrayList<ContactItem> contactItems;
     private Context context;
     private int[] light_color_array;
+    //원본 주소록
     private ArrayList<ContactItem> origList;
 
     public SelectContactsAdapter(ArrayList<ContactItem> contactItems, Context context){
         this.contactItems = contactItems;
+        this.origList = contactItems;
         this.context = context;
         light_color_array = context.getResources().getIntArray(R.array.user_color);
     }
@@ -50,6 +53,13 @@ public class SelectContactsAdapter extends BaseAdapter implements Filterable {
         return position;
     }
 
+    public void setOriginalItemChecked(int id, boolean value){
+        origList.get(id).setChecked(value);
+    }
+
+    public boolean getOriginalItemChecked(int id){
+        return origList.get(id).getChecked();
+    }
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         Viewholder holder;
@@ -86,6 +96,7 @@ public class SelectContactsAdapter extends BaseAdapter implements Filterable {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 //getItem(position).setChecked(isChecked);
+                DLog.d("position : "+position+" "+isChecked);
             }
         });
         holder.checkBox.setChecked(contactItem.getChecked());
@@ -99,8 +110,6 @@ public class SelectContactsAdapter extends BaseAdapter implements Filterable {
             protected FilterResults performFiltering(CharSequence constraint) {
                 final FilterResults return_filter = new FilterResults();
                 final ArrayList<ContactItem> results = new ArrayList<ContactItem>();
-                if (origList == null)
-                    origList = contactItems;
                 if (constraint != null){
                     if (origList != null && origList.size()>0){
                         for (final ContactItem c : origList){
@@ -130,7 +139,7 @@ public class SelectContactsAdapter extends BaseAdapter implements Filterable {
 
     private int getSelectedItemCount(){
         int num = 0;
-        for (ContactItem contactItem : contactItems){
+        for (ContactItem contactItem : origList){
             if (contactItem.getChecked())
                 num++;
         }
@@ -141,10 +150,10 @@ public class SelectContactsAdapter extends BaseAdapter implements Filterable {
         if (getSelectedItemCount() <= 0)
             return null;
         ArrayList<String> array = new ArrayList<String>();
-
-        for (int i = 0; i< contactItems.size(); i++){
-            if (contactItems.get(i).getChecked())
-                array.add(String.valueOf(i));
+        DLog.d("contacts size "+origList.size());
+        for (int i = 0; i< origList.size(); i++){
+            if (origList.get(i).getChecked())
+                array.add(String.valueOf(origList.get(i).getId()));
         }
 
         return array;

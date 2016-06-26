@@ -5,11 +5,14 @@ import java.io.Serializable;
 /**
  * Created by Mhwan on 2016. 3. 23..
  */
+
+//id 값은 리스트뷰의 position 값
 public class ContactItem implements Serializable{
     private String user_phNumber, user_Name;
     private int color_Id = -1;
     private boolean isChecked = false;
     private long photo_id=0, person_id=0;
+    private int id;
     private Contact_type type = Contact_type.NAME_TYPE;
 
     public ContactItem(){}
@@ -45,6 +48,12 @@ public class ContactItem implements Serializable{
     }
     public String getUser_Name(){
         return user_Name;
+    }
+    public void setId(int id){
+        this.id = id;
+    }
+    public int getId(){
+        return id;
     }
     public void setUser_phNumber(String string){
         this.user_phNumber = string;

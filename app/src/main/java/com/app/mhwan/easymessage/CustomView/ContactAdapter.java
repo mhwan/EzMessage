@@ -100,13 +100,13 @@ public class ContactAdapter extends BaseSwipeAdapter implements Filterable {
     }
 
     @Override
-    public void fillValues(final int position, final View convertView) {
+    public void fillValues(int position, final View convertView) {
         Viewholder viewholder = new Viewholder();
         viewholder.circle = (RandomProfileIcon) convertView.findViewById(R.id.ic_person);
         viewholder.phNum_textview = (TextView) convertView.findViewById(R.id.contact_list_phNumber);
         viewholder.userName_textview = (TextView) convertView.findViewById(R.id.contact_list_name);
         viewholder.user_imageview = (CircleImageView) convertView.findViewById(R.id.image_person);
-        ContactItem contactItem = contactItemList.get(position);
+        final ContactItem contactItem = contactItemList.get(position);
         viewholder.phNum_textview.setText(contactItem.getUser_phNumber());
         viewholder.userName_textview.setText(contactItem.getUser_Name());
         if (contactItem.getColor_Id() < 0){
@@ -125,13 +125,13 @@ public class ContactAdapter extends BaseSwipeAdapter implements Filterable {
             @Override
             public void onClick(View v) {
                 if (new RequestPermission(context, 1).isPermission(root_view))
-                    context.startActivity(new Intent("android.intent.action.CALL", Uri.parse("tel:" + getItem(position).getUser_phNumber())));
+                    context.startActivity(new Intent("android.intent.action.CALL", Uri.parse("tel:" + contactItem.getUser_phNumber())));
             }
         });
         convertView.findViewById(R.id.swipe_message).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createSelectDialog(position).show();
+                createSelectDialog(contactItem.getId()).show();
             }
         });
     }
