@@ -146,12 +146,14 @@ public class AppUtility {
                 number = number.substring(0, 4) + "-" + number.substring(4);
             }
         } else {
-            if (number.length() == 10)
+            if (number.length() == 10 && number.length()>=6)
                 number = number.substring(0, 3) + "-" + number.substring(3, 6)+ "-"+number.substring(6);
-            else if (number.startsWith("1"))
+            else if (number.startsWith("1") && number.length() >= 7)
                 number = number.substring(0, 1) + "-" + number.substring(1, 4)+ "-"+number.substring(4, 7)+"-"+number.substring(7);
-            else
+            else if (number.length() >=6)
                 number = number.substring(0, 3) + "-" + number.substring(3, 6)+ "-"+number.substring(6);
+            else
+                number = number.substring(0, 3) + "-" + number.substring(3);
         }
 
         return number;

@@ -89,11 +89,10 @@ public class SettingActivity extends AppCompatActivity {
 
             //메시지 최대 발신 길이는 해외 140, 우리나라 80으로
             pref_message_length.setDefaultValue(getDefaultbyte());
-
             notify = getActivity().getResources().getStringArray(R.array.notification_type);
             //preference 값 초기화
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            changeSummary(pref_message_length, sharedPreferences.getString("key_message_byte", "80"));
+            changeSummary(pref_message_length, sharedPreferences.getString("key_message_byte", getDefaultbyte()));
             if (pref_notifi_type.getValue() == null)
                 pref_notifi_type.setValueIndex(0);
             changeSummary(pref_notifi_type, notify[Integer.valueOf(sharedPreferences.getString("key_notification_type", "0"))]);
